@@ -1,0 +1,312 @@
+dy,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,
+pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,
+small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,
+form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,
+canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,
+output,ruby,section,summary,time,mark,audio,video {
+    border:0;
+    font-size:100%;
+    font:inherit;
+    vertical-align:baseline;
+    padding:0;
+}
+
+div, p {
+    margin-left:5px;
+    margin-top: 20px;
+}
+
+article,aside,details,figcaption,
+figure,footer,header,hgroup,menu,nav,
+section {
+    display:block;
+}
+
+ol,ul {
+    list-style:none;
+}
+
+blockquote,q{
+    quotes:none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+    content:none;
+}
+
+table {
+    border-collapse:collapse;
+    border-spacing:0;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+       }
+	
+       html,
+       body,
+       header {
+           //background-color: #000000; /* Black */
+	}
+
+	html {
+	    overflow: hidden;
+    }
+
+    body {
+      opacity: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+//  text-transform: lowercase;
+  font-size: 25px;
+  letter-spacing: 2px;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+           background-color: #000000; /* Black */
+	   color: white !important;
+	}
+	.container {
+        background-image: linear-gradient(to left, rgba(0, 0, 0, 0), rgb(0, 0, 0)) !important;
+	}
+}
+body {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  color: black;
+  font-family: Arial;
+  letter-spacing: inherit;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body.begin {
+    opacity: 1;
+}
+
+.textScramble{
+	font-size:14px !important;
+
+}
+
+.name {
+    text-align: left;
+//color:orange;
+}
+
+.status {
+    text-align: left;
+    font-size: 13px;
+}
+
+.ps {
+    text-align: left;
+    font-size: 9px;
+}
+
+.status a {
+  position: relative;
+  color: currentColor;
+  text-decoration-color: rgba(70, 255, 146, 0.5);
+  transition: color .0s ease;
+}
+
+.workplace a:after {
+  content: "";
+  opacity: 0;
+  display: block;
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  border-bottom: 3px solid currentColor;
+  transition: opacity .75s ease;
+}
+
+
+.workplace a:hover {
+  color: rgb(194, 142, 14);
+  transition: color .25s ease;
+}
+
+#medium a:hover {
+  color: rgb(0, 171, 107);
+  transition: color .25s ease;
+}
+
+
+#linkedin a:hover {
+  color: rgb(0, 119, 181);
+  transition: color .25s ease;
+}
+
+#github a:hover {
+    color: rgb(120, 120, 120);
+    transition: color .25s ease;
+}
+
+#resume a:hover{
+    color: rgb(194, 142, 14);
+    transition: color .25s ease;
+}
+.email span:hover
+{
+    color:#FFA500;
+    transition: color .25s ease;
+}
+
+#donate_bitcoin a:hover{
+    color:#ffbb11;
+    transition: color .25s ease;
+}
+
+.status a:hover{
+        -webkit-animation: color-change 2s infinite;
+        -moz-animation: color-change 2s infinite;
+        -o-animation: color-change 2s infinite;
+        -ms-animation: color-change 2s infinite;
+        animation: color-change 2s infinite;
+    }
+
+    @-webkit-keyframes color-change {
+        0% { text-decoration-color: rgb(70, 255, 146); }
+        50% { text-decoration-color: rgb(255, 70, 179); }
+        100% { text-decoration-color: rgb(70, 255, 146); }
+    }
+    @-moz-keyframes color-change {
+        0% { text-decoration-color: rgb(70, 255, 146); }
+        50% { text-decoration-color: rgb(255, 70, 179); }
+        100% { text-decoration-color: rgb(70, 255, 146); }
+    }
+    @-ms-keyframes color-change {
+        0% { text-decoration-color: rgb(70, 255, 146); }
+        50% { text-decoration-color: rgb(255, 70, 179); }
+        100% { text-decoration-color: rgb(70, 255, 146); }
+    }
+    @-o-keyframes color-change {
+        0% { text-decoration-color: rgb(70, 255, 146); }
+        50% { text-decoration-color: rgb(255, 70, 179); }
+        100% { text-decoration-color: rgb(70, 255, 146); }
+    }
+    @keyframes color-change {
+        0% { text-decoration-color: rgb(70, 255, 146); }
+        50% { text-decoration-color: rgb(255, 70, 179); }
+        100% { text-decoration-color: rgb(70, 255, 146); }
+    }
+
+
+
+/* The switch - the box around the slider */
+    #themeDiv{
+	  display:none;
+	  top:0px;
+	  right:0px;
+	  position:absolute;
+	  margin-right:20px;
+    }
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #111116;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #ECECE7;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #111116;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+canvas{
+position:absolute;
+}
+.container{
+z-index: 1;
+max-width: 100%;
+margin-left:0px;
+height: inherit;
+margin-top:0px;
+background-image: linear-gradient(to left, rgba(255, 255, 255, 0), rgb(255, 255, 255));
+}
+#coordinates{
+	margin-left: 0px;
+	position: absolute;
+	bottom: 5px;
+	font-family: monospace;
+	font-size: 7px;
+	z-index:1;
+	color: gray;
+}
+.main{
+position:relative;
+top:30%;
+padding-top:0%;
+}
