@@ -1,312 +1,463 @@
-dy,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,
-pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,
-small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,
-form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,
-canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,
-output,ruby,section,summary,time,mark,audio,video {
-    border:0;
-    font-size:100%;
-    font:inherit;
-    vertical-align:baseline;
-    padding:0;
-}
-
-div, p {
-    margin-left:5px;
-    margin-top: 20px;
-}
-
-article,aside,details,figcaption,
-figure,footer,header,hgroup,menu,nav,
-section {
-    display:block;
-}
-
-ol,ul {
-    list-style:none;
-}
-
-blockquote,q{
-    quotes:none;
-}
-
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-    content:none;
-}
-
-table {
-    border-collapse:collapse;
-    border-spacing:0;
-}
-
+/* Swayfx/i3wm inspired reset and base styles */
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-       }
-	
-       html,
-       body,
-       header {
-           //background-color: #000000; /* Black */
-	}
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-	html {
-	    overflow: hidden;
+html {
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Root CSS variables for theming */
+:root {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #161616;
+    --bg-tertiary: #262626;
+    --border-color: #404040;
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --text-muted: #909090;
+    --accent-color: #d4765a;
+    --accent-secondary: #c4675a;
+    --name-color: #ffffff;
+}
+
+/* Light mode variables */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f5f5f5;
+        --bg-tertiary: #e0e0e0;
+        --border-color: #c0c0c0;
+        --text-primary: #000000;
+        --text-secondary: #2a2a2a;
+        --text-muted: #707070;
+        --accent-color: #b85d47;
+        --accent-secondary: #a55244;
+        --name-color: #000000;
     }
-
-    body {
-      opacity: 0;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-//  text-transform: lowercase;
-  font-size: 25px;
-  letter-spacing: 2px;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 
-@media (prefers-color-scheme: dark) {
-	body {
-           background-color: #000000; /* Black */
-	   color: white !important;
-	}
-	.container {
-        background-image: linear-gradient(to left, rgba(0, 0, 0, 0), rgb(0, 0, 0)) !important;
-	}
-}
 body {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  color: black;
-  font-family: Arial;
-  letter-spacing: inherit;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+    height: 100vh;
+    width: 100vw;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', 'Hack', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow: hidden;
+    cursor: default;
+    position: relative;
 }
 
-body.begin {
-    opacity: 1;
+/* i3wm-style status bar at top */
+.status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 26px;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 12px;
+    z-index: 1000;
 }
 
-.textScramble{
-	font-size:14px !important;
+.workspace-indicator {
+    display: flex;
+    gap: 8px;
+}
 
+.workspace {
+    padding: 2px 8px;
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    border-radius: 2px;
+    font-weight: 500;
+}
+
+.workspace.active {
+    background: var(--accent-color);
+    color: var(--bg-secondary);
+}
+
+.system-info {
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+}
+
+.info-item {
+    color: var(--text-secondary);
+}
+
+/* Main window container mimicking tiling WM */
+.wm-container {
+    position: absolute;
+    top: 26px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    background: var(--bg-primary);
+}
+
+/* Terminal-style window */
+.terminal-window {
+    flex: 1;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.window-header {
+    height: 32px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    justify-content: space-between;
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.control-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+.close-btn { background: #f38ba8; }
+.minimize-btn { background: #fab387; }
+.maximize-btn { background: #a6e3a1; }
+
+.window-title {
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.terminal-content {
+    flex: 1;
+    padding: 20px 20px 20px 20px;
+    background: var(--bg-secondary);
+    overflow-y: auto;
+    position: relative;
+    scroll-padding-top: 10px;
+}
+
+/* Terminal prompt styling */
+.prompt-line {
+    margin-bottom: 16px;
+    margin-top: 4px;
+}
+
+.prompt {
+    color: var(--accent-color);
+    margin-right: 8px;
+    font-weight: bold;
+}
+
+.user-info {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.path {
+    color: var(--accent-secondary);
+}
+
+/* Profile section styling */
+.profile {
+    margin-bottom: 24px;
 }
 
 .name {
-    text-align: left;
-//color:orange;
+    color: var(--name-color);
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(193, 120, 23, 0.3);
 }
 
-.status {
-    text-align: left;
-    font-size: 13px;
+.role {
+    color: var(--accent-color);
+    font-size: 16px;
+    margin-bottom: 16px;
+    font-style: italic;
 }
 
-.ps {
-    text-align: left;
-    font-size: 9px;
+/* Command output styling */
+.command-line {
+    margin-bottom: 8px;
+    color: var(--text-muted);
 }
 
-.status a {
-  position: relative;
-  color: currentColor;
-  text-decoration-color: rgba(70, 255, 146, 0.5);
-  transition: color .0s ease;
+.command-output {
+    margin-bottom: 16px;
+    color: var(--text-primary);
 }
 
-.workplace a:after {
-  content: "";
-  opacity: 0;
-  display: block;
-  position: absolute;
-  left: 0;
-  bottom: -3px;
-  width: 100%;
-  border-bottom: 3px solid currentColor;
-  transition: opacity .75s ease;
+.muted {
+    color: var(--text-muted);
 }
 
-
-.workplace a:hover {
-  color: rgb(194, 142, 14);
-  transition: color .25s ease;
+.input-prompt {
+    margin-bottom: 4px;
 }
 
-#medium a:hover {
-  color: rgb(0, 171, 107);
-  transition: color .25s ease;
+.input-container {
+    display: flex;
+    align-items: center;
 }
 
-
-#linkedin a:hover {
-  color: rgb(0, 119, 181);
-  transition: color .25s ease;
+.input-wrapper {
+    margin-left: 4px;
+    flex: 1;
+    position: relative;
 }
 
-#github a:hover {
-    color: rgb(120, 120, 120);
-    transition: color .25s ease;
+#terminal-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: inherit;
+    width: 100%;
+    caret-color: transparent;
 }
 
-#resume a:hover{
-    color: rgb(194, 142, 14);
-    transition: color .25s ease;
-}
-.email span:hover
-{
-    color:#FFA500;
-    transition: color .25s ease;
-}
-
-#donate_bitcoin a:hover{
-    color:#ffbb11;
-    transition: color .25s ease;
+#custom-cursor {
+    position: absolute;
+    height: 2px;
+    width: 8px;
+    background: var(--accent-color);
+    bottom: 2px;
+    left: 0px;
+    animation: blink 1s infinite;
+    pointer-events: none;
 }
 
-.status a:hover{
-        -webkit-animation: color-change 2s infinite;
-        -moz-animation: color-change 2s infinite;
-        -o-animation: color-change 2s infinite;
-        -ms-animation: color-change 2s infinite;
-        animation: color-change 2s infinite;
+/* Link styling */
+.links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.link-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.link-item:hover {
+    background: var(--border-color);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    transform: translateX(4px);
+}
+
+.link-icon {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+}
+
+/* Special hover effects for different platforms */
+.link-item[href*="github"]:hover {
+    border-color: #a6adc8;
+    color: #a6adc8;
+}
+
+.link-item[href*="medium"]:hover {
+    border-color: #a6e3a1;
+    color: #a6e3a1;
+}
+
+.link-item[href*="linkedin"]:hover {
+    border-color: #74c7ec;
+    color: #74c7ec;
+}
+
+.link-item[href*="resume"]:hover,
+.link-item[href*="pdf"]:hover {
+    border-color: #fab387;
+    color: #fab387;
+}
+
+.link-item[href*="mailto"]:hover {
+    border-color: #f38ba8;
+    color: #f38ba8;
+}
+
+.link-item[href*="donate"]:hover {
+    border-color: #f9e2af;
+    color: #f9e2af;
+}
+
+/* Terminal cursor animation */
+.cursor {
+    display: inline-block;
+    background: var(--accent-color);
+    width: 8px;
+    height: 16px;
+    margin-left: 2px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    body {
+        font-size: 12px;
+        /* Account for mobile browser bars */
+        min-height: 100vh;
+        height: auto;
     }
-
-    @-webkit-keyframes color-change {
-        0% { text-decoration-color: rgb(70, 255, 146); }
-        50% { text-decoration-color: rgb(255, 70, 179); }
-        100% { text-decoration-color: rgb(70, 255, 146); }
+    
+    .status-bar {
+        height: 22px;
+        padding: 0 8px;
+        font-size: 10px;
     }
-    @-moz-keyframes color-change {
-        0% { text-decoration-color: rgb(70, 255, 146); }
-        50% { text-decoration-color: rgb(255, 70, 179); }
-        100% { text-decoration-color: rgb(70, 255, 146); }
+    
+    .workspace {
+        padding: 1px 6px;
+        font-size: 10px;
     }
-    @-ms-keyframes color-change {
-        0% { text-decoration-color: rgb(70, 255, 146); }
-        50% { text-decoration-color: rgb(255, 70, 179); }
-        100% { text-decoration-color: rgb(70, 255, 146); }
+    
+    .wm-container {
+        top: 22px;
+        padding: 4px;
+        gap: 1px;
+        /* Allow for extra scrolling room */
+        min-height: calc(100vh - 22px);
+        height: auto;
     }
-    @-o-keyframes color-change {
-        0% { text-decoration-color: rgb(70, 255, 146); }
-        50% { text-decoration-color: rgb(255, 70, 179); }
-        100% { text-decoration-color: rgb(70, 255, 146); }
+    
+    .terminal-window {
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        /* Ensure window grows with content */
+        min-height: calc(100vh - 30px);
+        height: auto;
     }
-    @keyframes color-change {
-        0% { text-decoration-color: rgb(70, 255, 146); }
-        50% { text-decoration-color: rgb(255, 70, 179); }
-        100% { text-decoration-color: rgb(70, 255, 146); }
+    
+    .window-header {
+        height: 24px;
+        padding: 0 8px;
     }
-
-
-
-/* The switch - the box around the slider */
-    #themeDiv{
-	  display:none;
-	  top:0px;
-	  right:0px;
-	  position:absolute;
-	  margin-right:20px;
+    
+    .window-title {
+        font-size: 10px;
     }
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: #111116;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #ECECE7;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #111116;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-canvas{
-position:absolute;
-}
-.container{
-z-index: 1;
-max-width: 100%;
-margin-left:0px;
-height: inherit;
-margin-top:0px;
-background-image: linear-gradient(to left, rgba(255, 255, 255, 0), rgb(255, 255, 255));
-}
-#coordinates{
-	margin-left: 0px;
-	position: absolute;
-	bottom: 5px;
-	font-family: monospace;
-	font-size: 7px;
-	z-index:1;
-	color: gray;
-}
-.main{
-position:relative;
-top:30%;
-padding-top:0%;
+    
+    .control-btn {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .terminal-content {
+        padding: 16px 8px 80px 8px; /* Reduced bottom padding */
+        scroll-padding-top: 8px;
+        scroll-padding-bottom: 20px;
+        /* Ensure smooth scrolling without abrupt cutoffs */
+        min-height: calc(100vh - 46px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+    
+    /* Ensure terminal output always has top spacing */
+    #terminal-output {
+        padding-top: 8px;
+    }
+    
+    .name {
+        font-size: 18px;
+        margin-bottom: 4px;
+    }
+    
+    .role {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .prompt-line {
+        margin-bottom: 12px;
+    }
+    
+    .profile {
+        margin-bottom: 16px;
+    }
+    
+    .links {
+        gap: 4px;
+    }
+    
+    .link-item {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    .link-icon {
+        width: 12px;
+        height: 12px;
+        margin-right: 6px;
+    }
+    
+    
+    /* Make input area more touch-friendly */
+    #input-line {
+        margin-top: 8px;
+        /* Extra margin to ensure it's not at the very bottom */
+        margin-bottom: 20px;
+    }
+    
+    #input-line > div:first-child {
+        margin-bottom: 2px;
+        font-size: 11px;
+    }
+    
+    #terminal-input {
+        font-size: 12px;
+        min-height: 20px;
+    }
+    
+    #custom-cursor {
+        width: 6px;
+        height: 12px;
+    }
 }

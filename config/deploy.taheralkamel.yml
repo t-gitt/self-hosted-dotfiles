@@ -15,7 +15,9 @@ servers:
 # Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption. 
 proxy: 
   ssl: true
-  host: taheralkamel.com
+  hosts:
+    - taheralkamel.com
+    - www.taheralkamel.com
 
 
 # Configure builder setup.

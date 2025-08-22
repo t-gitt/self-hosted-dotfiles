@@ -1,65 +1,366 @@
-<html>
-	<!-- "The only secure truth men have is that which they themselves create and dramatize." -->
+<!-- "The only secure truth men have is that which they themselves create and dramatize." -->
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<link rel='shortcut icon' type='image/x-icon' href='/favicon.ico?v=2' />
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta property="og:site_title" content="Taheralkamel" />
-    <meta property="og:title" content="taheralkamel" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://taheralkamel.xyz/" />
-    <meta property="og:description" content="This is my personal website where I have links to my online addresses and contains information I consider relevent and suitable for public sharing."/>
-	<title>taheralkamel</title>
-	<meta property="description" content="This is my personal website where I have links to my online addresses and contains information I consider relevent and suitable for public sharing."/>
-
-  	<!-- styles -->
-	<link rel="icon" href="/images/icons/favicon/favicon.ico">
-  	<!-- scripts -->
-	<link rel="stylesheet" href="style.css" type="text/css" media="screen" charset="utf-8">
-    <script src="/js/bifurcation.js" defer></script>
-  	<!-- 
-        <link rel="stylesheet" href="https://unpkg.com/tachyons@4.8.0/css/tachyons.min.css"/><meta name="theme-color" content="#151515"> 
-        <script src="js/p5.min.js" defer></script>
-        <script src="/js/game_of_life.js" defer></script>
-	-->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 	
+	<!-- Meta tags -->
+	<title>taher</title>
+	<meta name="description" content="Software & Devops Engineer | personal website">
+	<meta property="og:title" content="taher">
+	<meta property="og:description" content="Software & Devops Engineer | personal website">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://taheralkamel.com">
+	<meta name="theme-color" content="#1e1e2e">
 	
+	<!-- Styles -->
+	<link rel="stylesheet" href="style.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 </head>
-<body class="begin" id='body'>
-
-	<div class='container'>
-
-		<div class='main'>
-
-			<p class="name">Taher Alkamel</p>
-			<div class="textScramble">
-				Software Engineer
-			</div>
-			<br>
-			<p class="status" id="github">
-				<a href="https://github.com/t-gitt" target="_blank">Github</a>
-			</p>
-			<p class="status" id="medium">
-				<a href="https://medium.com/@taheralkamel" target="_blank">Medium</a>
-			</p>
-			<p class="status" id="linkedin">
-				<a href="http://www.linkedin.com/in/taheralkamel/" target="_blank">Linkedin</a>
-			</p>
-			<p class="status" id="resume">
-				<a href="/taheralkamelresume.pdf" target="_blank">Resume</a>
-			</p>
-			<p class="status" >
-				<a href='mailto:taheralkamel@gmail.com' class="email"><span>Contact</span></a>
-			</p>
-			<br>
-			<br>
-			<p class='status' id='donate_bitcoin'>
-				<a href='/donate.html' class="">_</a>
-			</p>
+<body>
+	<!-- i3wm-style status bar -->
+	<div class="status-bar">
+		<div class="workspace-indicator">
+			<div class="workspace">1</div>
+			<div class="workspace active">2</div>
+			<div class="workspace">3</div>
+			<div class="workspace">4</div>
+		</div>
+		<div class="system-info">
+			<span class="info-item">taher@alkamel</span>
+			<span class="info-item" id="current-time">00:00</span>
+			<span class="info-item">🌐 Online</span>
 		</div>
 	</div>
-	<canvas id="canvas"></canvas>
+
+	<!-- Main window container -->
+	<div class="wm-container">
+		<div class="terminal-window">
+			<!-- Terminal content -->
+			<div class="terminal-content">
+				<!-- Terminal prompt -->
+				<div class="prompt-line">
+					<div><span class="prompt">❯</span> <span style="color: var(--text-muted);">whoami</span></div>
+				</div>
+				
+				<!-- Profile information -->
+				<div class="profile" style="color: var(--text-primary);" id="initial-about">
+				</div>
+                <p>
+                    Welcome to my terminal-style page. Type <span style="color: var(--text-muted)">help</span> to get a list of available commands
+                    <br>
+                    <br>
+                </p>
+				
+				<!-- Terminal output area -->
+				<div id="terminal-output">
+					<!-- Initial links command -->
+					<div style="margin-bottom: 16px; color: var(--text-muted);">
+						<span class="prompt">❯</span> <span style="color: var(--text-muted);">links</span>
+					</div>
+					
+					<div style="margin-bottom: 16px; color: var(--text-primary);" id="initial-links">
+					</div>
+				</div>
+				
+				<!-- Input prompt line -->
+				<div id="input-line">
+					<div style="display: flex; align-items: center;">
+						<span class="prompt">❯</span>
+					<span style="margin-left: 4px; flex: 1; position: relative;">
+						<input type="text" id="terminal-input" autocomplete="off" style="
+							background: transparent; 
+							border: none; 
+							outline: none; 
+							color: var(--text-primary); 
+							font-family: inherit; 
+							font-size: inherit; 
+							width: 100%;
+							caret-color: transparent;
+						" placeholder="">
+						<span id="custom-cursor" style="
+							position: absolute;
+							height: 2px;
+							width: 8px;
+							background: var(--accent-color);
+							bottom: 2px;
+							left: 0px;
+							animation: blink 1s infinite;
+							pointer-events: none;
+						"></span>
+					</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// ===== CONFIGURATION =====
+		const MOBILE_BREAKPOINT = 768;
+		const KEYBOARD_THRESHOLD = 0.8;
+		
+		// ===== UTILITY FUNCTIONS =====
+		const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
+		
+		// ===== STATUS BAR =====
+		function updateTime() {
+			const now = new Date();
+			const time = now.toLocaleTimeString('de-DE', { 
+				timeZone: 'Europe/Berlin',
+				hour12: false, 
+				hour: '2-digit', 
+				minute: '2-digit' 
+			});
+			document.getElementById('current-time').textContent = `${time} Köln`;
+		}
+		
+		updateTime();
+		setInterval(updateTime, 1000);
+
+		// ===== TERMINAL INITIALIZATION =====
+		const terminalInput = document.getElementById('terminal-input');
+		const terminalOutput = document.getElementById('terminal-output');
+		const commandHistory = [];
+		let historyIndex = -1;
+
+		// ===== CONTENT DEFINITIONS =====
+		const calculateYearsOfExperience = () => {
+			const startYear = 2020;
+			const currentYear = new Date().getFullYear();
+			return currentYear - startYear;
+		};
+		
+		const MESSAGES = {
+			about: `<span style="color: var(--name-color); font-weight: bold;">Taher Alkamel</span><br>
+<span style="color: var(--accent-color);">Software & Devops Engineer</span><br>
+<br>
+With over ${calculateYearsOfExperience()} years of experience in designing, building, and scaling robust backend systems, I specialize in Python, Ruby, Go, and modern web technologies. Passionate about open-source software and minimalist solutions. I lead teams to deliver clean, efficient, and impactful code.<br>`,
+			
+			links: `<span style="color: var(--accent-color);">Social Links:</span><br>
+<span style="color: var(--accent-color);">→</span> GitHub: <a href="https://github.com/t-gitt" target="_blank" style="color: var(--text-primary); text-decoration: underline;">github.com/t-gitt</a><br>
+<span style="color: var(--accent-color);">→</span> Medium: <a href="https://medium.com/@taheralkamel" target="_blank" style="color: var(--text-primary); text-decoration: underline;">medium.com/@taheralkamel</a><br>
+<span style="color: var(--accent-color);">→</span> LinkedIn: <a href="http://www.linkedin.com/in/taheralkamel/" target="_blank" style="color: var(--text-primary); text-decoration: underline;">linkedin.com/in/taheralkamel</a><br>
+<span style="color: var(--accent-color);">→</span> Resume: <a href="/taheralkamelresume.pdf" target="_blank" style="color: var(--text-primary); text-decoration: underline;">View PDF</a>`,
+			
+			help: `Available commands:<br>
+<a href="#" onclick="executeCommand('help'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">help</a>     - Show this help message<br>
+<a href="#" onclick="executeCommand('whoami'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">whoami</a>   - About me<br>
+<a href="#" onclick="executeCommand('links'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">links</a>    - Show social links<br>
+<a href="#" onclick="executeCommand('contact'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">contact</a>  - Contact information<br>
+<a href="#" onclick="executeCommand('resume'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">resume</a>   - View resume<br>
+<a href="#" onclick="executeCommand('donate'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">donate</a>   - Support my work<br>
+<a href="#" onclick="executeCommand('clear'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">clear</a>    - Clear terminal`,
+			
+			contact: `<span style="color: var(--accent-color);">Contact Information:</span><br>
+<span style="color: var(--accent-color);">@</span> Email: <a href="mailto:taheralkamel@gmail.com" style="color: var(--text-primary); text-decoration: underline;">taheralkamel@gmail.com</a><br>`,
+			
+			donate: `<span style="color: var(--accent-color);">Support My Work:</span><br>
+<br>
+<span style="color: var(--accent-color);">$</span> PayPal:<br>
+<a href="https://www.paypal.com/paypalme/Taheralkamel" target="_blank" style="color: var(--text-primary); text-decoration: underline;">paypal.me/Taheralkamel</a><br>
+<br>
+<span style="color: var(--accent-color);">₿</span> Bitcoin:<br>
+<span style="color: var(--text-primary); font-family: monospace; background: var(--bg-tertiary); padding: 2px 4px; border-radius: 3px;">bc1qawj2lp8kxzf5n9hew7s72sq2l4e2q72643rgs0</span>
+<button onclick="navigator.clipboard.writeText('bc1qawj2lp8kxzf5n9hew7s72sq2l4e2q72643rgs0'); this.textContent='Copied!'" style="background: var(--accent-color); color: var(--bg-secondary); border: none; padding: 2px 6px; margin-left: 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Copy</button><br>`
+		};
+
+		// ===== MOBILE SCROLL HANDLING =====
+		let isKeyboardOpen = false;
+		let initialViewportHeight = window.innerHeight;
+
+		function scrollToBottom() {
+			const terminalContent = document.querySelector('.terminal-content');
+			setTimeout(() => {
+				terminalContent.scrollTop = terminalContent.scrollHeight;
+			}, 50);
+		}
+
+		function scrollToShowInput() {
+			const inputLine = document.getElementById('input-line');
+			
+			if (isMobile() && isKeyboardOpen) {
+				setTimeout(() => {
+					inputLine.scrollIntoView({ 
+						behavior: 'auto',
+						block: 'nearest'
+					});
+				}, 100);
+			} else {
+				scrollToBottom();
+			}
+		}
+
+		function handleViewportChange() {
+			if (!isMobile()) return;
+			
+			const currentHeight = window.innerHeight;
+			const wasKeyboardOpen = isKeyboardOpen;
+			
+			isKeyboardOpen = currentHeight < initialViewportHeight * KEYBOARD_THRESHOLD;
+			
+			if (isKeyboardOpen && !wasKeyboardOpen) {
+				setTimeout(scrollToShowInput, 300);
+			} else if (!isKeyboardOpen && wasKeyboardOpen) {
+				setTimeout(scrollToBottom, 100);
+			}
+		}
+
+		function updateViewportHeight() {
+			setTimeout(() => {
+				initialViewportHeight = window.innerHeight;
+				handleViewportChange();
+			}, 500);
+		}
+
+		// ===== CUSTOM CURSOR =====
+		const customCursor = document.getElementById('custom-cursor');
+		
+		// Cache canvas for cursor positioning to avoid repeated DOM creation
+		const cursorCanvas = document.createElement('canvas');
+		const cursorContext = cursorCanvas.getContext('2d');
+		cursorContext.font = '14px JetBrains Mono, monospace';
+		
+		function updateCursorPosition() {
+			const textWidth = cursorContext.measureText(terminalInput.value).width;
+			customCursor.style.left = textWidth + 'px';
+		}
+
+		// ===== EVENT LISTENERS =====
+		terminalInput.focus();
+		document.addEventListener('click', () => terminalInput.focus());
+		window.addEventListener('resize', handleViewportChange);
+		window.addEventListener('orientationchange', updateViewportHeight);
+		terminalInput.addEventListener('input', updateCursorPosition);
+		terminalInput.addEventListener('keyup', updateCursorPosition);
+		
+		terminalInput.addEventListener('focus', () => {
+			if (isMobile()) {
+				setTimeout(() => {
+					if (window.innerHeight < initialViewportHeight * KEYBOARD_THRESHOLD) {
+						isKeyboardOpen = true;
+						scrollToShowInput();
+					}
+				}, 400);
+			}
+		});
+
+		// ===== INITIALIZATION =====
+		document.getElementById('initial-about').innerHTML = MESSAGES.about;
+		document.getElementById('initial-links').innerHTML = MESSAGES.links;
+
+		// ===== COMMANDS =====
+		const commands = {
+			help: () => MESSAGES.help,
+			whoami: () => MESSAGES.about,
+			links: () => MESSAGES.links,
+			contact: () => MESSAGES.contact,
+			donate: () => MESSAGES.donate,
+			
+			
+			resume: () => {
+				window.open('/taheralkamelresume.pdf', '_blank');
+				return 'Opening resume in new tab...';
+			},
+			
+			clear: () => {
+				terminalOutput.innerHTML = '';
+				terminalOutput.offsetHeight; // Force reflow
+				return null;
+			}
+		};
+
+		// ===== INPUT HANDLING =====
+		terminalInput.addEventListener('keydown', (e) => {
+			switch (e.key) {
+				case 'Enter':
+					e.preventDefault();
+					const command = terminalInput.value.trim();
+					if (command) {
+						commandHistory.unshift(command);
+						historyIndex = -1;
+						executeCommand(command);
+					}
+					terminalInput.value = '';
+					break;
+					
+				case 'ArrowUp':
+					e.preventDefault();
+					if (historyIndex < commandHistory.length - 1) {
+						historyIndex++;
+						terminalInput.value = commandHistory[historyIndex];
+					}
+					break;
+					
+				case 'ArrowDown':
+					e.preventDefault();
+					if (historyIndex > 0) {
+						historyIndex--;
+						terminalInput.value = commandHistory[historyIndex];
+					} else if (historyIndex === 0) {
+						historyIndex = -1;
+						terminalInput.value = '';
+					}
+					break;
+			}
+		});
+
+		// ===== COMMAND EXECUTION =====
+		function createOutputElement(content, isError = false) {
+			const element = document.createElement('div');
+			element.className = 'command-output';
+			element.style.display = 'block';
+			element.style.visibility = 'visible';
+			
+			if (isError) {
+				element.style.color = '#f38ba8';
+				element.textContent = content;
+			} else {
+				element.innerHTML = content;
+			}
+			
+			return element;
+		}
+		
+		function executeCommand(command) {
+			// Add command line to output
+			const commandLine = document.createElement('div');
+			commandLine.className = 'command-line';
+			commandLine.innerHTML = `<span class="prompt">❯</span> ${command}`;
+			terminalOutput.appendChild(commandLine);
+			
+			// Execute command
+			const commandFunction = commands[command.toLowerCase()];
+			if (commandFunction) {
+				const result = commandFunction();
+				if (result !== null) {
+					const outputElement = createOutputElement(result);
+					terminalOutput.appendChild(outputElement);
+				}
+			} else {
+				const errorElement = createOutputElement(`bash: ${command}: command not found`, true);
+				terminalOutput.appendChild(errorElement);
+			}
+			
+			scrollToBottom();
+		}
+
+		// ===== KEYBOARD SHORTCUTS =====
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+				e.preventDefault();
+				const interrupt = document.createElement('div');
+				interrupt.style.color = '#f38ba8';
+				interrupt.textContent = '^C';
+				terminalOutput.appendChild(interrupt);
+				terminalInput.value = '';
+			}
+		});
+	</script>
 </body>
 </html>
