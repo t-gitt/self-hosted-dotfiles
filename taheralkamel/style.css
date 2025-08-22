@@ -339,6 +339,20 @@ body {
     51%, 100% { opacity: 0; }
 }
 
+/* Desktop scaling */
+@media (min-width: 769px) {
+    body {
+        transform: scale(1.5);
+        transform-origin: top left;
+        width: 66.67%;
+        height: 66.67%;
+    }
+    
+    html {
+        overflow: auto;
+    }
+}
+
 /* Mobile optimizations */
 @media (max-width: 768px) {
     body {
