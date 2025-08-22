@@ -32,7 +32,7 @@
 			<div class="workspace">4</div>
 		</div>
 		<div class="system-info">
-			<span class="info-item">taher@alkamel</span>
+			<span class="info-item" id="spotify-status">♪ connecting...</span>
 			<span class="info-item" id="current-time">00:00</span>
 			<a href="https://github.com/t-gitt/self-hosted-dotfiles/tree/main/taheralkamel" target="_blank" class="info-item" style="color: var(--text-muted); text-decoration: none;">src</a>
 		</div>
@@ -120,8 +120,48 @@
 			document.getElementById('current-time').textContent = `${time} Köln`;
 		}
 		
+		async function updateSpotifyStatus() {
+			const statusElement = document.getElementById('spotify-status');
+			
+			try {
+				const response = await fetch('/api/spotify/current-track');
+				const data = await response.json();
+				
+				if (data.error) {
+					statusElement.textContent = data.display || '♪ error';
+					statusElement.style.color = 'var(--text-muted)';
+					return;
+				}
+				
+				const displayText = isMobile() 
+					? (data.mobileDisplay || data.display || '♪ offline')
+					: (data.display || '♪ offline');
+				
+				statusElement.textContent = displayText;
+				
+				if (data.isPlaying) {
+					statusElement.style.color = 'var(--accent-color)';
+					if (data.external_url) {
+						statusElement.style.cursor = 'pointer';
+						statusElement.onclick = () => window.open(data.external_url, '_blank');
+					}
+				} else {
+					statusElement.style.color = 'var(--text-muted)';
+					statusElement.style.cursor = 'default';
+					statusElement.onclick = null;
+				}
+				
+			} catch (error) {
+				console.error('Failed to fetch Spotify status:', error);
+				statusElement.textContent = '♪ offline';
+				statusElement.style.color = 'var(--text-muted)';
+			}
+		}
+		
 		updateTime();
+		updateSpotifyStatus();
 		setInterval(updateTime, 1000);
+		setInterval(updateSpotifyStatus, 30000); // Update every 30 seconds
 
 		// ===== TERMINAL INITIALIZATION =====
 		const terminalInput = document.getElementById('terminal-input');
