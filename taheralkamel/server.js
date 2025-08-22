@@ -181,6 +181,34 @@ app.get('/api/spotify/current-track', async (req, res) => {
       if (lastTrackInfo.artist && lastTrackInfo.track) {
         return res.json(createTrackResponse(false, lastTrackInfo.artist, lastTrackInfo.track, 'paused', lastTrackInfo.external_url));
       }
+      
+      try {
+        const recentResponse = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (recentResponse.ok) {
+          const recentData = await recentResponse.json();
+          if (recentData.items && recentData.items.length > 0) {
+            const recentTrack = recentData.items[0].track;
+            const artist = recentTrack.artists[0]?.name || 'Unknown Artist';
+            const songTitle = recentTrack.name || 'Unknown Track';
+            
+            lastTrackInfo.artist = artist;
+            lastTrackInfo.track = songTitle;
+            lastTrackInfo.external_url = recentTrack.external_urls?.spotify;
+            lastTrackInfo.lastUpdated = Date.now();
+            
+            return res.json(createTrackResponse(false, artist, songTitle, 'not playing', recentTrack.external_urls?.spotify));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch recent tracks:', error);
+      }
+      
       return res.json(handleNoTrackResponse());
     }
 
@@ -201,6 +229,34 @@ app.get('/api/spotify/current-track', async (req, res) => {
       if (lastTrackInfo.artist && lastTrackInfo.track) {
         return res.json(createTrackResponse(false, lastTrackInfo.artist, lastTrackInfo.track, 'stopped', lastTrackInfo.external_url));
       }
+      
+      try {
+        const recentResponse = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (recentResponse.ok) {
+          const recentData = await recentResponse.json();
+          if (recentData.items && recentData.items.length > 0) {
+            const recentTrack = recentData.items[0].track;
+            const artist = recentTrack.artists[0]?.name || 'Unknown Artist';
+            const songTitle = recentTrack.name || 'Unknown Track';
+            
+            lastTrackInfo.artist = artist;
+            lastTrackInfo.track = songTitle;
+            lastTrackInfo.external_url = recentTrack.external_urls?.spotify;
+            lastTrackInfo.lastUpdated = Date.now();
+            
+            return res.json(createTrackResponse(false, artist, songTitle, 'not playing', recentTrack.external_urls?.spotify));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch recent tracks:', error);
+      }
+      
       return res.json(handleNoTrackResponse());
     }
 
