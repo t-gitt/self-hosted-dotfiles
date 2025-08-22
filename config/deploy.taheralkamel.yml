@@ -9,7 +9,7 @@ volumes:
 # Deploy to these servers.
 servers:
   web:
-    - 46.62.155.217
+    - taheralkamel.com
 
 env:
   clear:
