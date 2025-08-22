@@ -17,6 +17,13 @@ let spotifyTokens = {
   expires_at: null
 };
 
+let lastTrackInfo = {
+  artist: null,
+  track: null,
+  lastUpdated: null,
+  external_url: null
+};
+
 function loadTokens() {
   try {
     if (fs.existsSync(TOKEN_FILE)) {
@@ -35,18 +42,11 @@ function saveTokens() {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-
     fs.writeFileSync(TOKEN_FILE, JSON.stringify(spotifyTokens, null, 2));
   } catch (error) {
     console.error('Failed to save tokens:', error.message);
   }
 }
-
-loadTokens();
-
-app.use(cors());
-app.use(express.json());
-app.use(express.static('.'));
 
 function formatForMobile(artist, songTitle) {
   const maxLength = 25;
@@ -67,13 +67,46 @@ function formatForMobile(artist, songTitle) {
   return `♪ ${songTitle.substring(0, maxLength - 5)}...`;
 }
 
+function formatDisplays(artist, track, status = '') {
+  const suffix = status ? ` (${status})` : '';
+  const fullDisplay = `♪ ${artist} - ${track}${suffix}`;
+  const mobileDisplay = formatForMobile(artist, track + suffix);
+  const desktopDisplay = fullDisplay.length > 50 ? fullDisplay.substring(0, 47) + '...' : fullDisplay;
+  
+  return {
+    fullDisplay,
+    mobileDisplay,
+    desktopDisplay,
+    external_url: `https://open.spotify.com/search/${encodeURIComponent(artist + ' ' + track)}`
+  };
+}
+
+function createTrackResponse(isPlaying, artist, track, status = '', externalUrl = null) {
+  const displays = formatDisplays(artist, track, status);
+  return {
+    isPlaying,
+    artist,
+    track,
+    display: displays.desktopDisplay,
+    mobileDisplay: displays.mobileDisplay,
+    fullDisplay: displays.fullDisplay,
+    external_url: externalUrl || displays.external_url
+  };
+}
+
+function handleNoTrackResponse() {
+  if (lastTrackInfo.artist && lastTrackInfo.track) {
+    return createTrackResponse(false, lastTrackInfo.artist, lastTrackInfo.track, 'not playing', lastTrackInfo.external_url);
+  }
+  return { isPlaying: false, display: '♪ not playing' };
+}
+
 async function refreshAccessToken() {
   if (!spotifyTokens.refresh_token) {
     throw new Error('No refresh token available');
   }
 
   const fetch = (await import('node-fetch')).default;
-
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
@@ -118,6 +151,12 @@ async function getValidAccessToken() {
   return null;
 }
 
+loadTokens();
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static('.'));
+
 app.get('/api/spotify/current-track', async (req, res) => {
   try {
     const accessToken = await getValidAccessToken();
@@ -131,7 +170,6 @@ app.get('/api/spotify/current-track', async (req, res) => {
     }
 
     const fetch = (await import('node-fetch')).default;
-
     const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -140,10 +178,10 @@ app.get('/api/spotify/current-track', async (req, res) => {
     });
 
     if (response.status === 204) {
-      return res.json({
-        isPlaying: false,
-        display: '♪ not playing'
-      });
+      if (lastTrackInfo.artist && lastTrackInfo.track) {
+        return res.json(createTrackResponse(false, lastTrackInfo.artist, lastTrackInfo.track, 'paused', lastTrackInfo.external_url));
+      }
+      return res.json(handleNoTrackResponse());
     }
 
     if (response.status === 401) {
@@ -160,10 +198,10 @@ app.get('/api/spotify/current-track', async (req, res) => {
     const data = await response.json();
 
     if (!data || !data.item) {
-      return res.json({
-        isPlaying: false,
-        display: '♪ not playing'
-      });
+      if (lastTrackInfo.artist && lastTrackInfo.track) {
+        return res.json(createTrackResponse(false, lastTrackInfo.artist, lastTrackInfo.track, 'stopped', lastTrackInfo.external_url));
+      }
+      return res.json(handleNoTrackResponse());
     }
 
     const track = data.item;
@@ -171,27 +209,16 @@ app.get('/api/spotify/current-track', async (req, res) => {
     const songTitle = track.name || 'Unknown Track';
     const isPlaying = data.is_playing;
 
-    const fullDisplay = `♪ ${artist} - ${songTitle}`;
-    const mobileDisplay = isPlaying ? formatForMobile(artist, songTitle) : '♪ paused';
-    const desktopDisplay = isPlaying ? (fullDisplay.length > 50 ? fullDisplay.substring(0, 47) + '...' : fullDisplay) : '♪ paused';
+    lastTrackInfo.artist = artist;
+    lastTrackInfo.track = songTitle;
+    lastTrackInfo.lastUpdated = Date.now();
+    lastTrackInfo.external_url = track.external_urls?.spotify;
 
-    res.json({
-      isPlaying,
-      artist,
-      track: songTitle,
-      display: desktopDisplay,
-      mobileDisplay: mobileDisplay,
-      fullDisplay: fullDisplay,
-      external_url: track.external_urls?.spotify
-    });
+    const status = isPlaying ? '' : 'paused';
+    res.json(createTrackResponse(isPlaying, artist, songTitle, status, track.external_urls?.spotify));
 
   } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Spotify API error:', error);
-    } else {
-      console.error('Spotify API error occurred');
-    }
-
+    console.error(process.env.NODE_ENV !== 'production' ? 'Spotify API error:' : 'Spotify API error occurred', error);
     res.json({
       error: 'API error',
       display: '♪ error'
@@ -221,7 +248,6 @@ app.get('/callback', async (req, res) => {
 
   try {
     const fetch = (await import('node-fetch')).default;
-
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
@@ -265,11 +291,7 @@ app.get('/callback', async (req, res) => {
       res.status(400).send('Failed to get access token: ' + JSON.stringify(data));
     }
   } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Spotify auth error:', error);
-    } else {
-      console.error('Spotify authentication failed');
-    }
+    console.error(process.env.NODE_ENV !== 'production' ? 'Spotify auth error:' : 'Spotify authentication failed', error);
     res.status(500).send('Authentication failed');
   }
 });

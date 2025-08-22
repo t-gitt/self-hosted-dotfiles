@@ -142,16 +142,18 @@
 				
 				statusElement.textContent = displayText;
 				
-				if (data.isPlaying) {
-					statusElement.style.color = 'var(--accent-color)';
-					if (data.external_url) {
-						statusElement.style.cursor = 'pointer';
-						statusElement.onclick = () => window.open(data.external_url, '_blank');
-					}
+				if (data.external_url) {
+					statusElement.style.cursor = 'pointer';
+					statusElement.onclick = () => window.open(data.external_url, '_blank');
 				} else {
-					statusElement.style.color = 'var(--text-muted)';
 					statusElement.style.cursor = 'default';
 					statusElement.onclick = null;
+				}
+				
+				if (data.isPlaying) {
+					statusElement.style.color = 'var(--accent-color)';
+				} else {
+					statusElement.style.color = 'var(--text-muted)';
 				}
 				
 			} catch (error) {
