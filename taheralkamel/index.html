@@ -52,7 +52,7 @@
                     <span style="color: var(--accent-color);">→ Resume:</span> <a href="/taheralkamelresume.pdf" target="_blank" style="color: var(--text-primary); text-decoration: underline;">View PDF</a>
                     <br>
                     <br>
-                    Welcome to my terminal-style page! Type <span style="color: var(--text-muted)">help</span> to get a list of available commands.
+                    Welcome to my terminal-style page! Type <a href="#" onclick="executeCommand('help'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">help</a> to get a list of available commands.
                     <br>
                     <br>
                 </p>
@@ -71,9 +71,9 @@
 				<!-- Input prompt line -->
 				<div id="input-line">
 					<div style="display: flex; align-items: center;">
-						<span class="prompt">❯</span>
+						<label for="terminal-input" class="prompt" style="color: var(--accent-color); margin-right: 8px; font-weight: bold;">❯</label>
 					<span style="margin-left: 4px; flex: 1; position: relative;">
-						<input type="text" id="terminal-input" autocomplete="off" style="
+						<input type="text" id="terminal-input" autocomplete="off" aria-label="Terminal command input" style="
 							background: transparent; 
 							border: none; 
 							outline: none; 

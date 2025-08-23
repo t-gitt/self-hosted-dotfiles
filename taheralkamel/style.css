@@ -18,9 +18,9 @@ html {
     --border-color: #404040;
     --text-primary: #ffffff;
     --text-secondary: #e0e0e0;
-    --text-muted: #909090;
-    --accent-color: #d4765a;
-    --accent-secondary: #c4675a;
+    --text-muted: #b5b5b5;
+    --accent-color: #ff8c69;
+    --accent-secondary: #e67e5c;
     --name-color: #ffffff;
 }
 
@@ -33,9 +33,9 @@ html {
         --border-color: #c0c0c0;
         --text-primary: #000000;
         --text-secondary: #2a2a2a;
-        --text-muted: #707070;
-        --accent-color: #b85d47;
-        --accent-secondary: #a55244;
+        --text-muted: #4a4a4a;
+        --accent-color: #cc5500;
+        --accent-secondary: #b84d00;
         --name-color: #000000;
     }
 }
