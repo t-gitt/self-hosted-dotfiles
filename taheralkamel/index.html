@@ -190,7 +190,7 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 <a href="#" onclick="executeCommand('whoami'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">whoami</a>   - About me<br>
 <a href="#" onclick="executeCommand('links'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">links</a>    - Show social links<br>
 <a href="#" onclick="executeCommand('contact'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">contact</a>  - Contact information<br>
-<a href="#" onclick="executeCommand('media'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">media</a>    - My top Spotify tracks<br>
+<a href="#" onclick="executeCommand('music'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">music</a>    - Song tracks I listen to<br>
 <a href="#" onclick="executeCommand('resume'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">resume</a>   - View resume<br>
 <a href="#" onclick="executeCommand('donate'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">donate</a>   - Support my work<br>
 <a href="#" onclick="executeCommand('clear'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">clear</a>    - Clear terminal`,
@@ -333,7 +333,7 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 					}
 				}
 				
-				let output = `<span style="color: var(--accent-color);">🎵 My Music</span><br><br>`;
+				let output = ``;
 				
 				// Recent tracks section - compact format
 				output += `<span style="color: var(--accent-color);">Recent:</span><br>`;
@@ -373,7 +373,7 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 			links: () => MESSAGES.links,
 			contact: () => MESSAGES.contact,
 			donate: () => MESSAGES.donate,
-			media: async () => {
+			music: async () => {
 				const result = await showTopTracks();
 				return result;
 			},
