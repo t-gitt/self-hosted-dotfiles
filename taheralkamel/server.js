@@ -82,7 +82,7 @@ function formatDisplays(artist, track, status = '') {
 }
 
 function createTrackResponse(isPlaying, artist, track, status = '', externalUrl = null) {
-  const displays = formatDisplays(artist, track, status);
+  const displays = formatDisplays(artist, track);
   return {
     isPlaying,
     artist,
@@ -96,7 +96,7 @@ function createTrackResponse(isPlaying, artist, track, status = '', externalUrl 
 
 function handleNoTrackResponse() {
   if (lastTrackInfo.artist && lastTrackInfo.track) {
-    return createTrackResponse(false, lastTrackInfo.artist, lastTrackInfo.track, 'not playing', lastTrackInfo.external_url);
+    return createTrackResponse(false, lastTrackInfo.artist, lastTrackInfo.track, '', lastTrackInfo.external_url);
   }
   return { isPlaying: false, display: '♪ not playing' };
 }
@@ -170,108 +170,68 @@ app.get('/api/spotify/current-track', async (req, res) => {
     }
 
     const fetch = (await import('node-fetch')).default;
-    const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+    
+    // First, try to get currently playing track
+    const currentResponse = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       }
     });
 
-    if (response.status === 204) {
-      if (lastTrackInfo.artist && lastTrackInfo.track) {
-        return res.json(createTrackResponse(false, lastTrackInfo.artist, lastTrackInfo.track, 'paused', lastTrackInfo.external_url));
-      }
-      
-      try {
-        const recentResponse = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (recentResponse.ok) {
-          const recentData = await recentResponse.json();
-          if (recentData.items && recentData.items.length > 0) {
-            const recentTrack = recentData.items[0].track;
-            const artist = recentTrack.artists[0]?.name || 'Unknown Artist';
-            const songTitle = recentTrack.name || 'Unknown Track';
-            
-            lastTrackInfo.artist = artist;
-            lastTrackInfo.track = songTitle;
-            lastTrackInfo.external_url = recentTrack.external_urls?.spotify;
-            lastTrackInfo.lastUpdated = Date.now();
-            
-            return res.json(createTrackResponse(false, artist, songTitle, 'not playing', recentTrack.external_urls?.spotify));
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch recent tracks:', error);
-      }
-      
-      return res.json(handleNoTrackResponse());
-    }
-
-    if (response.status === 401) {
+    if (currentResponse.status === 401) {
       return res.json({
         error: 'Spotify token expired',
         display: '♪ auth error'
       });
     }
 
-    if (!response.ok) {
-      throw new Error(`Spotify API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (!data || !data.item) {
-      if (lastTrackInfo.artist && lastTrackInfo.track) {
-        return res.json(createTrackResponse(false, lastTrackInfo.artist, lastTrackInfo.track, 'stopped', lastTrackInfo.external_url));
-      }
+    // If we have a currently playing track, use it
+    if (currentResponse.ok && currentResponse.status !== 204) {
+      const currentData = await currentResponse.json();
       
-      try {
-        const recentResponse = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
+      if (currentData && currentData.item) {
+        const track = currentData.item;
+        const artist = track.artists[0]?.name || 'Unknown Artist';
+        const songTitle = track.name || 'Unknown Track';
         
-        if (recentResponse.ok) {
-          const recentData = await recentResponse.json();
-          if (recentData.items && recentData.items.length > 0) {
-            const recentTrack = recentData.items[0].track;
-            const artist = recentTrack.artists[0]?.name || 'Unknown Artist';
-            const songTitle = recentTrack.name || 'Unknown Track';
-            
-            lastTrackInfo.artist = artist;
-            lastTrackInfo.track = songTitle;
-            lastTrackInfo.external_url = recentTrack.external_urls?.spotify;
-            lastTrackInfo.lastUpdated = Date.now();
-            
-            return res.json(createTrackResponse(false, artist, songTitle, 'not playing', recentTrack.external_urls?.spotify));
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch recent tracks:', error);
+        lastTrackInfo.artist = artist;
+        lastTrackInfo.track = songTitle;
+        lastTrackInfo.external_url = track.external_urls?.spotify;
+        lastTrackInfo.lastUpdated = Date.now();
+        
+        return res.json(createTrackResponse(true, artist, songTitle, '', track.external_urls?.spotify));
       }
-      
-      return res.json(handleNoTrackResponse());
     }
 
-    const track = data.item;
-    const artist = track.artists[0]?.name || 'Unknown Artist';
-    const songTitle = track.name || 'Unknown Track';
-    const isPlaying = data.is_playing;
+    // Fallback to recently played if no current track
+    const recentResponse = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-    lastTrackInfo.artist = artist;
-    lastTrackInfo.track = songTitle;
-    lastTrackInfo.lastUpdated = Date.now();
-    lastTrackInfo.external_url = track.external_urls?.spotify;
+    if (!recentResponse.ok) {
+      throw new Error(`Spotify API error: ${recentResponse.status}`);
+    }
 
-    const status = isPlaying ? '' : 'paused';
-    res.json(createTrackResponse(isPlaying, artist, songTitle, status, track.external_urls?.spotify));
+    const recentData = await recentResponse.json();
+
+    if (recentData.items && recentData.items.length > 0) {
+      const recentTrack = recentData.items[0].track;
+      const artist = recentTrack.artists[0]?.name || 'Unknown Artist';
+      const songTitle = recentTrack.name || 'Unknown Track';
+      
+      lastTrackInfo.artist = artist;
+      lastTrackInfo.track = songTitle;
+      lastTrackInfo.external_url = recentTrack.external_urls?.spotify;
+      lastTrackInfo.lastUpdated = Date.now();
+      
+      return res.json(createTrackResponse(true, artist, songTitle, '', recentTrack.external_urls?.spotify));
+    }
+
+    return res.json(handleNoTrackResponse());
 
   } catch (error) {
     console.error(process.env.NODE_ENV !== 'production' ? 'Spotify API error:' : 'Spotify API error occurred', error);
@@ -283,7 +243,7 @@ app.get('/api/spotify/current-track', async (req, res) => {
 });
 
 app.get('/auth/spotify', (req, res) => {
-  const scopes = 'user-read-currently-playing user-read-playback-state';
+  const scopes = 'user-read-recently-played user-read-currently-playing user-read-playback-state';
   const spotifyAuthUrl = 'https://accounts.spotify.com/authorize?' +
     new URLSearchParams({
       response_type: 'code',
