@@ -242,8 +242,121 @@ app.get('/api/spotify/current-track', async (req, res) => {
   }
 });
 
+app.get('/api/spotify/recent-tracks', async (req, res) => {
+  try {
+    const accessToken = await getValidAccessToken();
+
+    if (!accessToken) {
+      return res.json({
+        error: 'No valid Spotify token. Please authenticate first.'
+      });
+    }
+
+    const fetch = (await import('node-fetch')).default;
+    const limit = req.query.limit || 5;
+
+    const response = await fetch(`https://api.spotify.com/v1/me/player/recently-played?limit=${limit}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.status === 401) {
+      return res.json({
+        error: 'Spotify token expired'
+      });
+    }
+
+    if (!response.ok) {
+      throw new Error(`Spotify API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    const tracks = data.items.map((item, index) => ({
+      rank: index + 1,
+      name: item.track.name,
+      artist: item.track.artists.map(artist => artist.name).join(', '),
+      album: item.track.album.name,
+      duration_ms: item.track.duration_ms,
+      external_url: item.track.external_urls?.spotify,
+      played_at: item.played_at
+    }));
+
+    res.json({
+      total: data.total,
+      tracks
+    });
+
+  } catch (error) {
+    console.error(process.env.NODE_ENV !== 'production' ? 'Spotify recent tracks error:' : 'Spotify API error occurred', error);
+    res.json({
+      error: 'Failed to fetch recent tracks'
+    });
+  }
+});
+
+app.get('/api/spotify/top-tracks', async (req, res) => {
+  try {
+    const accessToken = await getValidAccessToken();
+
+    if (!accessToken) {
+      return res.json({
+        error: 'No valid Spotify token. Please authenticate first.'
+      });
+    }
+
+    const fetch = (await import('node-fetch')).default;
+    const timeRange = req.query.time_range || 'medium_term'; // short_term, medium_term, long_term
+    const limit = req.query.limit || 5;
+
+    const response = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=${timeRange}&limit=${limit}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.status === 401) {
+      return res.json({
+        error: 'Spotify token expired'
+      });
+    }
+
+    if (!response.ok) {
+      throw new Error(`Spotify API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    const tracks = data.items.map((track, index) => ({
+      rank: index + 1,
+      name: track.name,
+      artist: track.artists.map(artist => artist.name).join(', '),
+      album: track.album.name,
+      popularity: track.popularity,
+      duration_ms: track.duration_ms,
+      external_url: track.external_urls?.spotify,
+      preview_url: track.preview_url
+    }));
+
+    res.json({
+      time_range: timeRange,
+      total: data.total,
+      tracks
+    });
+
+  } catch (error) {
+    console.error(process.env.NODE_ENV !== 'production' ? 'Spotify top tracks error:' : 'Spotify API error occurred', error);
+    res.json({
+      error: 'Failed to fetch top tracks'
+    });
+  }
+});
+
 app.get('/auth/spotify', (req, res) => {
-  const scopes = 'user-read-recently-played user-read-currently-playing user-read-playback-state';
+  const scopes = 'user-read-recently-played user-read-currently-playing user-read-playback-state user-top-read';
   const spotifyAuthUrl = 'https://accounts.spotify.com/authorize?' +
     new URLSearchParams({
       response_type: 'code',

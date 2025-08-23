@@ -190,6 +190,7 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 <a href="#" onclick="executeCommand('whoami'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">whoami</a>   - About me<br>
 <a href="#" onclick="executeCommand('links'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">links</a>    - Show social links<br>
 <a href="#" onclick="executeCommand('contact'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">contact</a>  - Contact information<br>
+<a href="#" onclick="executeCommand('media'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">media</a>    - My top Spotify tracks<br>
 <a href="#" onclick="executeCommand('resume'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">resume</a>   - View resume<br>
 <a href="#" onclick="executeCommand('donate'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">donate</a>   - Support my work<br>
 <a href="#" onclick="executeCommand('clear'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">clear</a>    - Clear terminal`,
@@ -287,6 +288,80 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 			}
 		});
 
+		// ===== MEDIA FUNCTIONS =====
+		function formatDuration(ms) {
+			const minutes = Math.floor(ms / 60000);
+			const seconds = ((ms % 60000) / 1000).toFixed(0);
+			return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+		}
+		
+		async function showTopTracks(timeRange = 'medium_term') {
+			try {
+				const [recentResponse, topResponse] = await Promise.all([
+					fetch('/api/spotify/recent-tracks?limit=10'),
+					fetch(`/api/spotify/top-tracks?time_range=${timeRange}&limit=10`)
+				]);
+				
+				const recentData = await recentResponse.json();
+				const topData = await topResponse.json();
+				
+				if (recentData.error || topData.error) {
+					return `<span style="color: #f38ba8;">Error: ${recentData.error || topData.error}</span><br>Try visiting <a href="/auth/spotify" target="_blank" style="color: var(--accent-color); text-decoration: underline;">/auth/spotify</a> to re-authenticate`;
+				}
+				
+				// Create sets to track unique tracks and avoid duplicates
+				const recentTrackIds = new Set();
+				const topTrackIds = new Set();
+				const uniqueRecent = [];
+				const uniqueTop = [];
+				
+				// Get unique recent tracks
+				for (const track of recentData.tracks) {
+					const trackId = `${track.name}-${track.artist}`.toLowerCase();
+					if (!recentTrackIds.has(trackId) && uniqueRecent.length < 5) {
+						recentTrackIds.add(trackId);
+						uniqueRecent.push(track);
+					}
+				}
+				
+				// Get unique top tracks that aren't already in recent
+				for (const track of topData.tracks) {
+					const trackId = `${track.name}-${track.artist}`.toLowerCase();
+					if (!recentTrackIds.has(trackId) && !topTrackIds.has(trackId) && uniqueTop.length < 5) {
+						topTrackIds.add(trackId);
+						uniqueTop.push(track);
+					}
+				}
+				
+				let output = `<span style="color: var(--accent-color);">🎵 My Music</span><br><br>`;
+				
+				// Recent tracks section - compact format
+				output += `<span style="color: var(--accent-color);">Recent:</span><br>`;
+				uniqueRecent.forEach((track, index) => {
+					const trackLink = track.external_url ? 
+						`<a href="${track.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${track.name}</a>` : 
+						track.name;
+					output += `<span style="color: var(--text-muted);">${index + 1}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${track.artist}</span><br>`;
+				});
+				
+				output += `<br>`;
+				
+				// Top tracks section - compact format  
+				output += `<span style="color: var(--accent-color);">Top:</span><br>`;
+				uniqueTop.forEach((track, index) => {
+					const trackLink = track.external_url ? 
+						`<a href="${track.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${track.name}</a>` : 
+						track.name;
+					output += `<span style="color: var(--text-muted);">${index + 1}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${track.artist}</span><br>`;
+				});
+				
+				return output;
+			} catch (error) {
+				console.error('Failed to fetch tracks:', error);
+				return `<span style="color: #f38ba8;">Failed to load music data</span>`;
+			}
+		}
+
 		// ===== INITIALIZATION =====
 		document.getElementById('initial-about').innerHTML = MESSAGES.about;
 		document.getElementById('initial-links').innerHTML = MESSAGES.links;
@@ -298,7 +373,10 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 			links: () => MESSAGES.links,
 			contact: () => MESSAGES.contact,
 			donate: () => MESSAGES.donate,
-			
+			media: async () => {
+				const result = await showTopTracks();
+				return result;
+			},
 			
 			resume: () => {
 				window.open('/taheralkamelresume.pdf', '_blank');
@@ -364,7 +442,7 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 			return element;
 		}
 		
-		function executeCommand(command) {
+		async function executeCommand(command) {
 			// Add command line to output
 			const commandLine = document.createElement('div');
 			commandLine.className = 'command-line';
@@ -374,10 +452,16 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 			// Execute command
 			const commandFunction = commands[command.toLowerCase()];
 			if (commandFunction) {
-				const result = commandFunction();
-				if (result !== null) {
-					const outputElement = createOutputElement(result);
-					terminalOutput.appendChild(outputElement);
+				try {
+					const result = await commandFunction();
+					if (result !== null) {
+						const outputElement = createOutputElement(result);
+						terminalOutput.appendChild(outputElement);
+					}
+				} catch (error) {
+					console.error('Command execution error:', error);
+					const errorElement = createOutputElement('Command failed to execute', true);
+					terminalOutput.appendChild(errorElement);
 				}
 			} else {
 				const errorElement = createOutputElement(`bash: ${command}: command not found`, true);
