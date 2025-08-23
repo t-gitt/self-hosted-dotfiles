@@ -467,6 +467,23 @@ app.get('/up', (req, res) => {
   });
 });
 
+app.post('/api/log/command', (req, res) => {
+  const { command } = req.body;
+  const timestamp = new Date().toISOString();
+  const ip = req.get('CF-Connecting-IP') ||
+            req.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
+            req.get('X-Real-IP') ||
+            req.get('X-Client-IP') ||
+            req.connection?.remoteAddress ||
+            req.ip || '-';
+  const userAgent = req.get('User-Agent') || '-';
+  
+  // Log terminal command execution
+  console.log(`[TERMINAL] ${ip} [${timestamp}] executed: "${command}" "${userAgent}"`);
+  
+  res.status(200).json({ logged: true });
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });

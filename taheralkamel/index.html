@@ -443,6 +443,19 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 		}
 		
 		async function executeCommand(command) {
+			// Log command execution to server
+			try {
+				fetch('/api/log/command', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ command: command.trim() })
+				}).catch(() => {}); // Silently fail if logging fails
+			} catch (error) {
+				// Ignore logging errors
+			}
+			
 			// Add command line to output
 			const commandLine = document.createElement('div');
 			commandLine.className = 'command-line';
