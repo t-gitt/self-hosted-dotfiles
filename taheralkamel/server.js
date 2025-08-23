@@ -153,6 +153,40 @@ async function getValidAccessToken() {
 
 loadTokens();
 
+// Request logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  const timestamp = new Date().toISOString();
+  const method = req.method;
+  const url = req.url;
+  const userAgent = req.get('User-Agent') || '-';
+  
+  // Get real client IP through proxy headers
+  const ip = req.get('CF-Connecting-IP') ||           // Cloudflare
+            req.get('X-Forwarded-For')?.split(',')[0]?.trim() ||  // Load balancer/proxy
+            req.get('X-Real-IP') ||                   // Nginx proxy
+            req.get('X-Client-IP') ||                 // Apache
+            req.get('X-Forwarded') ||                 // General proxy
+            req.get('Forwarded') ||                   // RFC 7239
+            req.connection?.remoteAddress ||          // Direct connection
+            req.socket?.remoteAddress ||              // Socket connection
+            req.ip ||                                 // Express default
+            '-';
+  
+  const referer = req.get('Referer') || '-';
+
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const status = res.statusCode;
+    const contentLength = res.get('Content-Length') || '-';
+    
+    // Nginx-style access log format
+    console.log(`${ip} - - [${timestamp}] "${method} ${url} HTTP/1.1" ${status} ${contentLength} "${referer}" "${userAgent}" ${duration}ms`);
+  });
+
+  next();
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static('.'));
