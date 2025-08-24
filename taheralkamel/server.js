@@ -155,6 +155,11 @@ loadTokens();
 
 // Request logging middleware
 app.use((req, res, next) => {
+  // Skip logging for /up health check endpoint
+  if (req.url === '/up') {
+    return next();
+  }
+  
   const start = Date.now();
   const timestamp = new Date().toISOString();
   const method = req.method;
