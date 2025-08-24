@@ -295,11 +295,11 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 			return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 		}
 		
-		async function showTopTracks(timeRange = 'medium_term') {
+		async function showTopTracks(timeRange = 'short_term') {
 			try {
 				const [recentResponse, topResponse] = await Promise.all([
 					fetch('/api/spotify/recent-tracks?limit=10'),
-					fetch(`/api/spotify/top-tracks?time_range=${timeRange}&limit=10`)
+					fetch(`/api/spotify/top-artists?time_range=${timeRange}&limit=10`)
 				]);
 				
 				const recentData = await recentResponse.json();
@@ -309,13 +309,13 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 					return `<span style="color: #f38ba8;">Error: ${recentData.error || topData.error}</span><br>Try visiting <a href="/auth/spotify" target="_blank" style="color: var(--accent-color); text-decoration: underline;">/auth/spotify</a> to re-authenticate`;
 				}
 				
-				// Create sets to track unique tracks and avoid duplicates
+				// Create sets to track unique items within each section only
 				const recentTrackIds = new Set();
-				const topTrackIds = new Set();
+				const topArtistIds = new Set();
 				const uniqueRecent = [];
 				const uniqueTop = [];
 				
-				// Get unique recent tracks
+				// Get unique recent tracks (deduplicate within recent only)
 				for (const track of recentData.tracks) {
 					const trackId = `${track.name}-${track.artist}`.toLowerCase();
 					if (!recentTrackIds.has(trackId) && uniqueRecent.length < 5) {
@@ -324,12 +324,12 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 					}
 				}
 				
-				// Get unique top tracks that aren't already in recent
-				for (const track of topData.tracks) {
-					const trackId = `${track.name}-${track.artist}`.toLowerCase();
-					if (!recentTrackIds.has(trackId) && !topTrackIds.has(trackId) && uniqueTop.length < 5) {
-						topTrackIds.add(trackId);
-						uniqueTop.push(track);
+				// Get unique top artists (deduplicate within artists only)
+				for (const artist of topData.artists) {
+					const artistId = artist.name.toLowerCase();
+					if (!topArtistIds.has(artistId) && uniqueTop.length < 5) {
+						topArtistIds.add(artistId);
+						uniqueTop.push(artist);
 					}
 				}
 				
@@ -346,18 +346,19 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 				
 				output += `<br>`;
 				
-				// Top tracks section - compact format  
-				output += `<span style="color: var(--accent-color);">Top:</span><br>`;
-				uniqueTop.forEach((track, index) => {
-					const trackLink = track.external_url ? 
-						`<a href="${track.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${track.name}</a>` : 
-						track.name;
-					output += `<span style="color: var(--text-muted);">${index + 1}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${track.artist}</span><br>`;
+				// Top artists section - compact format  
+				output += `<span style="color: var(--accent-color);">Top Artists:</span><br>`;
+				uniqueTop.forEach((artist, index) => {
+					const artistLink = artist.external_url ? 
+						`<a href="${artist.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${artist.name}</a>` : 
+						artist.name;
+					const genreText = artist.genres ? ` <span style="color: var(--text-muted);">(${artist.genres.split(',')[0]})</span>` : '';
+					output += `<span style="color: var(--text-muted);">${index + 1}.</span> ${artistLink}${genreText}<br>`;
 				});
 				
 				return output;
 			} catch (error) {
-				console.error('Failed to fetch tracks:', error);
+				console.error('Failed to fetch music data:', error);
 				return `<span style="color: #f38ba8;">Failed to load music data</span>`;
 			}
 		}

@@ -331,7 +331,7 @@ app.get('/api/spotify/recent-tracks', async (req, res) => {
   }
 });
 
-app.get('/api/spotify/top-tracks', async (req, res) => {
+app.get('/api/spotify/top-artists', async (req, res) => {
   try {
     const accessToken = await getValidAccessToken();
 
@@ -343,9 +343,9 @@ app.get('/api/spotify/top-tracks', async (req, res) => {
 
     const fetch = (await import('node-fetch')).default;
     const timeRange = req.query.time_range || 'medium_term'; // short_term, medium_term, long_term
-    const limit = req.query.limit || 5;
+    const limit = req.query.limit || 10;
 
-    const response = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=${timeRange}&limit=${limit}`, {
+    const response = await fetch(`https://api.spotify.com/v1/me/top/artists?time_range=${timeRange}&limit=${limit}`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
@@ -364,27 +364,25 @@ app.get('/api/spotify/top-tracks', async (req, res) => {
 
     const data = await response.json();
 
-    const tracks = data.items.map((track, index) => ({
+    const artists = data.items.map((artist, index) => ({
       rank: index + 1,
-      name: track.name,
-      artist: track.artists.map(artist => artist.name).join(', '),
-      album: track.album.name,
-      popularity: track.popularity,
-      duration_ms: track.duration_ms,
-      external_url: track.external_urls?.spotify,
-      preview_url: track.preview_url
+      name: artist.name,
+      genres: artist.genres.join(', '),
+      popularity: artist.popularity,
+      followers: artist.followers.total,
+      external_url: artist.external_urls?.spotify
     }));
 
     res.json({
       time_range: timeRange,
       total: data.total,
-      tracks
+      artists
     });
 
   } catch (error) {
-    console.error(process.env.NODE_ENV !== 'production' ? 'Spotify top tracks error:' : 'Spotify API error occurred', error);
+    console.error(process.env.NODE_ENV !== 'production' ? 'Spotify top artists error:' : 'Spotify API error occurred', error);
     res.json({
-      error: 'Failed to fetch top tracks'
+      error: 'Failed to fetch top artists'
     });
   }
 });
