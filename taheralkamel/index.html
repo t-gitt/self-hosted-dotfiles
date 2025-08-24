@@ -178,7 +178,7 @@
 			about: `<span style="color: var(--name-color); font-weight: bold;">Taher Alkamel</span><br>
 <span style="color: var(--accent-color);">Software & Devops Engineer</span><br>
 <br>
-With over ${calculateYearsOfExperience()} years of experience in designing, building, and scaling robust backend systems, I specialize in Python, Ruby, Go, and modern web technologies. Passionate about open-source software and minimalist solutions. I lead teams to deliver clean, efficient, and impactful code.<br>`,
+With over ${calculateYearsOfExperience()} years of experience. I design and scale robust backend systems, lead cross-functional teams, and drive projects from concept to production. Passionate about open-source, minimalism, and impactful engineering.<br>`,
 			
 			links: `<span style="color: var(--accent-color);">Social Links:</span><br>
 <span style="color: var(--accent-color);">→</span> GitHub: <a href="https://github.com/t-gitt" target="_blank" style="color: var(--text-primary); text-decoration: underline;">github.com/t-gitt</a><br>
@@ -191,7 +191,7 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 <a href="#" onclick="executeCommand('links'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">links</a>    - Show social links<br>
 <a href="#" onclick="executeCommand('contact'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">contact</a>  - Contact information<br>
 <a href="#" onclick="executeCommand('music'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">music</a>    - Song tracks I listen to<br>
-<a href="#" onclick="executeCommand('resume'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">resume</a>   - View resume<br>
+<a href="#" onclick="executeCommand('resume'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">resume</a>   - Show resume summary<br>
 <a href="#" onclick="executeCommand('donate'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">donate</a>   - Support my work<br>
 <a href="#" onclick="executeCommand('clear'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">clear</a>    - Clear terminal`,
 			
@@ -205,7 +205,23 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 <br>
 <span style="color: var(--accent-color);">₿</span> Bitcoin:<br>
 <span style="color: var(--text-primary); font-family: monospace; background: var(--bg-tertiary); padding: 2px 4px; border-radius: 3px;">bc1qawj2lp8kxzf5n9hew7s72sq2l4e2q72643rgs0</span>
-<button onclick="navigator.clipboard.writeText('bc1qawj2lp8kxzf5n9hew7s72sq2l4e2q72643rgs0'); this.textContent='Copied!'" style="background: var(--accent-color); color: var(--bg-secondary); border: none; padding: 2px 6px; margin-left: 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Copy</button><br>`
+<button onclick="navigator.clipboard.writeText('bc1qawj2lp8kxzf5n9hew7s72sq2l4e2q72643rgs0'); this.textContent='Copied!'" style="background: var(--accent-color); color: var(--bg-secondary); border: none; padding: 2px 6px; margin-left: 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Copy</button><br>`,
+			
+			summary: `<span style="color: var(--accent-color);">Resume Summary:</span><br>
+<br>
+<span style="color: var(--text-primary);"><strong>Experience:</strong></span> ${calculateYearsOfExperience()} years in Software Engineering<br>
+<span style="color: var(--text-primary);"><strong>Current Role:</strong></span> Backend Technical Lead at <a href="https://www.tigerlab.com" target="_blank" style="color: var(--text-primary); text-decoration: underline;">tigerlab GmbH</a><br>
+<span style="color: var(--text-primary);"><strong>Location:</strong></span> Köln, Germany<br>
+<br>
+<span style="color: var(--text-primary);"><strong>Key Skills:</strong></span><br>
+<span style="color: var(--text-muted);">→</span> Backend: Django, Ruby on Rails, RESTful APIs, C#, PHP<br>
+<span style="color: var(--text-muted);">→</span> DevOps: Docker, Kubernetes, Linux, AWS, Azure<br>
+<span style="color: var(--text-muted);">→</span> Leadership: Team mentoring, client communication, architecture planning<br>
+<br>
+<span style="color: var(--text-primary);"><strong>Education:</strong></span> BSc. Software Engineering (Hons) - National University of Malaysia<br>
+<span style="color: var(--text-primary);"><strong>Certification:</strong></span> CPRE - Requirements Engineering<br>
+<br>
+<span style="color: var(--accent-color);">→</span> Full resume: <a href="/taheralkamelresume.pdf" target="_blank" style="color: var(--text-primary); text-decoration: underline;">Download PDF</a>`
 		};
 
 		// ===== MOBILE SCROLL HANDLING =====
@@ -379,15 +395,32 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 				return result;
 			},
 			
-			resume: () => {
-				window.open('/taheralkamelresume.pdf', '_blank');
-				return 'Opening resume in new tab...';
-			},
+			resume: () => MESSAGES.summary,
 			
 			clear: () => {
 				terminalOutput.innerHTML = '';
 				terminalOutput.offsetHeight; // Force reflow
 				return null;
+			},
+			
+			
+			// Shell-like aliases for better UX
+			ls: () => MESSAGES.links,        // ls = links
+			cv: () => MESSAGES.summary,      // cv = resume
+			mail: () => MESSAGES.contact,    // mail = contact
+			
+			// More easter eggs
+			echo: (args) => {
+				if (!args) return '';
+				// Easter egg for "echo hello"
+				if (args.toLowerCase().includes('hello')) {
+					return `${args}<br><br><span style="color: var(--accent-color);">👋 Hello there!</span>`;
+				}
+				return args;
+			},
+			date: () => {
+				const now = new Date();
+				return `<span style="color: var(--text-primary);">${now.toDateString()} ${now.toLocaleTimeString()}</span>`;
 			}
 		};
 
@@ -463,11 +496,16 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 			commandLine.innerHTML = `<span class="prompt">❯</span> ${command}`;
 			terminalOutput.appendChild(commandLine);
 			
+			// Parse command and arguments
+			const parts = command.trim().split(' ');
+			const cmdName = parts[0].toLowerCase();
+			const args = parts.slice(1).join(' ');
+			
 			// Execute command
-			const commandFunction = commands[command.toLowerCase()];
+			const commandFunction = commands[cmdName];
 			if (commandFunction) {
 				try {
-					const result = await commandFunction();
+					const result = await commandFunction(args);
 					if (result !== null) {
 						const outputElement = createOutputElement(result);
 						terminalOutput.appendChild(outputElement);
@@ -478,7 +516,7 @@ With over ${calculateYearsOfExperience()} years of experience in designing, buil
 					terminalOutput.appendChild(errorElement);
 				}
 			} else {
-				const errorElement = createOutputElement(`bash: ${command}: command not found`, true);
+				const errorElement = createOutputElement(`bash: ${cmdName}: command not found`, true);
 				terminalOutput.appendChild(errorElement);
 			}
 			
