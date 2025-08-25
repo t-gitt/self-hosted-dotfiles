@@ -352,68 +352,98 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 				
 				let output = ``;
 				
-				// Helper function to truncate text for consistent spacing
+				const isMobileView = window.innerWidth <= 768;
 				const truncateText = (text, maxLength) => {
 					return text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
 				};
 				
-				const isMobileView = window.innerWidth <= 768;
-				const itemsPerLine = isMobileView ? 1 : 2;
-				const maxTrackLength = isMobileView ? 30 : 25;
-				const maxArtistLength = isMobileView ? 20 : 18;
-				
-				// Recent tracks section
+				// Recent tracks section - using table layout for consistent spacing
 				output += `<span style="color: var(--accent-color);">Recent:</span><br>`;
-				for (let i = 0; i < Math.min(uniqueRecent.length, 10); i += itemsPerLine) {
-					let line = '';
+				output += `<div style="display: table; width: 100%; font-family: monospace;">`;
+				
+				for (let i = 0; i < Math.min(uniqueRecent.length, 10); i += (isMobileView ? 1 : 2)) {
+					output += `<div style="display: table-row;">`;
 					
-					for (let j = 0; j < itemsPerLine && (i + j) < Math.min(uniqueRecent.length, 10); j++) {
-						const track = uniqueRecent[i + j];
-						const trackName = truncateText(track.name, maxTrackLength);
-						const artistName = truncateText(track.artist, maxArtistLength);
+					// First item
+					if (i < Math.min(uniqueRecent.length, 10)) {
+						const track = uniqueRecent[i];
+						const trackName = truncateText(track.name, isMobileView ? 30 : 25);
+						const artistName = truncateText(track.artist, isMobileView ? 20 : 15);
 						
 						const trackLink = track.external_url ? 
 							`<a href="${track.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${trackName}</a>` : 
 							trackName;
 						
-						const trackEntry = `<span style="color: var(--text-muted);">${String(i + j + 1).padStart(2, ' ')}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${artistName}</span>`;
-						
-						if (j > 0) {
-							line += isMobileView ? '<br>' : ' <span style="color: var(--text-muted);">|</span> ';
-						}
-						line += trackEntry;
+						output += `<div style="display: table-cell; width: ${isMobileView ? '100%' : '50%'}; padding-right: 10px;">`;
+						output += `<span style="color: var(--text-muted);">${String(i + 1).padStart(2, ' ')}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${artistName}</span>`;
+						output += `</div>`;
 					}
 					
-					output += line + '<br>';
+					// Second item (desktop only)
+					if (!isMobileView && (i + 1) < Math.min(uniqueRecent.length, 10)) {
+						const track = uniqueRecent[i + 1];
+						const trackName = truncateText(track.name, 25);
+						const artistName = truncateText(track.artist, 15);
+						
+						const trackLink = track.external_url ? 
+							`<a href="${track.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${trackName}</a>` : 
+							trackName;
+						
+						output += `<div style="display: table-cell; width: 50%;">`;
+						output += `<span style="color: var(--text-muted);">${String(i + 2).padStart(2, ' ')}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${artistName}</span>`;
+						output += `</div>`;
+					}
+					
+					output += `</div>`;
 				}
 				
-				output += `<br>`;
+				output += `</div><br>`;
 				
 				// Top artists section
 				output += `<span style="color: var(--accent-color);">Top Artists:</span><br>`;
-				for (let i = 0; i < Math.min(uniqueTop.length, 10); i += itemsPerLine) {
-					let line = '';
+				output += `<div style="display: table; width: 100%; font-family: monospace;">`;
+				
+				for (let i = 0; i < Math.min(uniqueTop.length, 10); i += (isMobileView ? 1 : 2)) {
+					output += `<div style="display: table-row;">`;
 					
-					for (let j = 0; j < itemsPerLine && (i + j) < Math.min(uniqueTop.length, 10); j++) {
-						const artist = uniqueTop[i + j];
-						const artistName = truncateText(artist.name, maxArtistLength);
-						const genre = artist.genres ? truncateText(artist.genres.split(',')[0], 15) : '';
+					// First item
+					if (i < Math.min(uniqueTop.length, 10)) {
+						const artist = uniqueTop[i];
+						const artistName = truncateText(artist.name, isMobileView ? 25 : 18);
+						const genre = artist.genres ? truncateText(artist.genres.split(',')[0], 12) : '';
 						
 						const artistLink = artist.external_url ? 
 							`<a href="${artist.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${artistName}</a>` : 
 							artistName;
 						
 						const genreText = genre ? ` <span style="color: var(--text-muted);">(${genre})</span>` : '';
-						const artistEntry = `<span style="color: var(--text-muted);">${String(i + j + 1).padStart(2, ' ')}.</span> ${artistLink}${genreText}`;
 						
-						if (j > 0) {
-							line += isMobileView ? '<br>' : ' <span style="color: var(--text-muted);">|</span> ';
-						}
-						line += artistEntry;
+						output += `<div style="display: table-cell; width: ${isMobileView ? '100%' : '50%'}; padding-right: 10px;">`;
+						output += `<span style="color: var(--text-muted);">${String(i + 1).padStart(2, ' ')}.</span> ${artistLink}${genreText}`;
+						output += `</div>`;
 					}
 					
-					output += line + '<br>';
+					// Second item (desktop only)
+					if (!isMobileView && (i + 1) < Math.min(uniqueTop.length, 10)) {
+						const artist = uniqueTop[i + 1];
+						const artistName = truncateText(artist.name, 18);
+						const genre = artist.genres ? truncateText(artist.genres.split(',')[0], 12) : '';
+						
+						const artistLink = artist.external_url ? 
+							`<a href="${artist.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${artistName}</a>` : 
+							artistName;
+						
+						const genreText = genre ? ` <span style="color: var(--text-muted);">(${genre})</span>` : '';
+						
+						output += `<div style="display: table-cell; width: 50%;">`;
+						output += `<span style="color: var(--text-muted);">${String(i + 2).padStart(2, ' ')}.</span> ${artistLink}${genreText}`;
+						output += `</div>`;
+					}
+					
+					output += `</div>`;
 				}
+				
+				output += `</div>`;
 				
 				return output;
 			} catch (error) {
