@@ -193,6 +193,7 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 <a href="#" onclick="executeCommand('music'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">music</a>    - Song tracks I listen to<br>
 <a href="#" onclick="executeCommand('resume'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">resume</a>   - Show resume summary<br>
 <a href="#" onclick="executeCommand('donate'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">donate</a>   - Support my work<br>
+<a href="#" onclick="executeCommand('theme'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">theme</a>    - Toggle light/dark mode<br>
 <a href="#" onclick="executeCommand('clear'); return false;" style="color: var(--accent-color); text-decoration: underline; cursor: pointer;">clear</a>    - Clear terminal`,
 			
 			contact: `<span style="color: var(--accent-color);">Contact Information:</span><br>
@@ -379,7 +380,18 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 			}
 		}
 
+		// ===== THEME INITIALIZATION =====
+		function initializeTheme() {
+			const savedTheme = localStorage.getItem('theme');
+			const root = document.documentElement;
+			
+			if (savedTheme) {
+				root.setAttribute('data-theme', savedTheme);
+			}
+		}
+		
 		// ===== INITIALIZATION =====
+		initializeTheme();
 		document.getElementById('initial-about').innerHTML = MESSAGES.about;
 		document.getElementById('initial-links').innerHTML = MESSAGES.links;
 
@@ -421,6 +433,21 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 			date: () => {
 				const now = new Date();
 				return `<span style="color: var(--text-primary);">${now.toDateString()} ${now.toLocaleTimeString()}</span>`;
+			},
+			
+			theme: () => {
+				const root = document.documentElement;
+				const currentTheme = root.getAttribute('data-theme');
+				
+				if (currentTheme === 'light') {
+					root.setAttribute('data-theme', 'dark');
+					localStorage.setItem('theme', 'dark');
+					return `<span style="color: var(--text-primary);">Theme switched to <strong>dark mode</strong></span>`;
+				} else {
+					root.setAttribute('data-theme', 'light');
+					localStorage.setItem('theme', 'light');
+					return `<span style="color: var(--text-primary);">Theme switched to <strong>light mode</strong></span>`;
+				}
 			}
 		};
 

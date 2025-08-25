@@ -24,9 +24,23 @@ html {
     --name-color: #ffffff;
 }
 
-/* Light mode variables */
+/* Light theme overrides */
+:root[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #e0e0e0;
+    --border-color: #c0c0c0;
+    --text-primary: #000000;
+    --text-secondary: #2a2a2a;
+    --text-muted: #4a4a4a;
+    --accent-color: #cc5500;
+    --accent-secondary: #b84d00;
+    --name-color: #000000;
+}
+
+/* Apply theme automatically based on system preference only if no manual theme is set */
 @media (prefers-color-scheme: light) {
-    :root {
+    :root:not([data-theme]) {
         --bg-primary: #ffffff;
         --bg-secondary: #f5f5f5;
         --bg-tertiary: #e0e0e0;
@@ -51,6 +65,7 @@ body {
     overflow: hidden;
     cursor: default;
     position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* i3wm-style status bar at top */
@@ -68,6 +83,7 @@ body {
     padding: 0 12px;
     font-size: 12px;
     z-index: 1000;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .workspace-indicator {
@@ -121,6 +137,7 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .window-header {
@@ -163,6 +180,7 @@ body {
     overflow-y: auto;
     position: relative;
     scroll-padding-top: 10px;
+    transition: background-color 0.3s ease;
 }
 
 /* Terminal prompt styling */
@@ -342,7 +360,7 @@ body {
 /* Desktop scaling */
 @media (min-width: 769px) {
     body {
-        transform: scale(1.5);
+        transform: scale(1);
         transform-origin: top left;
         width: 66.67%;
         height: 66.67%;
