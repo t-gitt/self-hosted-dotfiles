@@ -375,7 +375,7 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 							trackName;
 						
 						output += `<div style="display: table-cell; width: ${isMobileView ? '100%' : '50%'}; padding-right: 10px;">`;
-						output += `<span style="color: var(--text-muted);">${String(i + 1).padStart(2, ' ')}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${artistName}</span>`;
+						output += `<span style="color: var(--text-muted);">•</span> ${trackLink} <span style="color: var(--text-muted);">by ${artistName}</span>`;
 						output += `</div>`;
 					}
 					
@@ -390,7 +390,7 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 							trackName;
 						
 						output += `<div style="display: table-cell; width: 50%;">`;
-						output += `<span style="color: var(--text-muted);">${String(i + 2).padStart(2, ' ')}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${artistName}</span>`;
+						output += `<span style="color: var(--text-muted);">•</span> ${trackLink} <span style="color: var(--text-muted);">by ${artistName}</span>`;
 						output += `</div>`;
 					}
 					
@@ -419,7 +419,7 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 						const genreText = genre ? ` <span style="color: var(--text-muted);">(${genre})</span>` : '';
 						
 						output += `<div style="display: table-cell; width: ${isMobileView ? '100%' : '50%'}; padding-right: 10px;">`;
-						output += `<span style="color: var(--text-muted);">${String(i + 1).padStart(2, ' ')}.</span> ${artistLink}${genreText}`;
+						output += `<span style="color: var(--text-muted);">•</span> ${artistLink}${genreText}`;
 						output += `</div>`;
 					}
 					
@@ -436,7 +436,7 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 						const genreText = genre ? ` <span style="color: var(--text-muted);">(${genre})</span>` : '';
 						
 						output += `<div style="display: table-cell; width: 50%;">`;
-						output += `<span style="color: var(--text-muted);">${String(i + 2).padStart(2, ' ')}.</span> ${artistLink}${genreText}`;
+						output += `<span style="color: var(--text-muted);">•</span> ${artistLink}${genreText}`;
 						output += `</div>`;
 					}
 					
