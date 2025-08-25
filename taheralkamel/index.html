@@ -335,7 +335,7 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 				// Get unique recent tracks (deduplicate within recent only)
 				for (const track of recentData.tracks) {
 					const trackId = `${track.name}-${track.artist}`.toLowerCase();
-					if (!recentTrackIds.has(trackId) && uniqueRecent.length < 5) {
+					if (!recentTrackIds.has(trackId) && uniqueRecent.length < 10) {
 						recentTrackIds.add(trackId);
 						uniqueRecent.push(track);
 					}
@@ -344,7 +344,7 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 				// Get unique top artists (deduplicate within artists only)
 				for (const artist of topData.artists) {
 					const artistId = artist.name.toLowerCase();
-					if (!topArtistIds.has(artistId) && uniqueTop.length < 5) {
+					if (!topArtistIds.has(artistId) && uniqueTop.length < 10) {
 						topArtistIds.add(artistId);
 						uniqueTop.push(artist);
 					}
@@ -352,26 +352,53 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 				
 				let output = ``;
 				
-				// Recent tracks section - compact format
+				// Recent tracks section - 2 per line format
 				output += `<span style="color: var(--accent-color);">Recent:</span><br>`;
-				uniqueRecent.forEach((track, index) => {
-					const trackLink = track.external_url ? 
-						`<a href="${track.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${track.name}</a>` : 
-						track.name;
-					output += `<span style="color: var(--text-muted);">${index + 1}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${track.artist}</span><br>`;
-				});
+				for (let i = 0; i < uniqueRecent.length; i += 2) {
+					const track1 = uniqueRecent[i];
+					const track2 = uniqueRecent[i + 1];
+					
+					const trackLink1 = track1.external_url ? 
+						`<a href="${track1.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${track1.name}</a>` : 
+						track1.name;
+					
+					let line = `<span style="color: var(--text-muted);">${i + 1}.</span> ${trackLink1} <span style="color: var(--text-muted);">by ${track1.artist}</span>`;
+					
+					if (track2) {
+						const trackLink2 = track2.external_url ? 
+							`<a href="${track2.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${track2.name}</a>` : 
+							track2.name;
+						line += ` | <span style="color: var(--text-muted);">${i + 2}.</span> ${trackLink2} <span style="color: var(--text-muted);">by ${track2.artist}</span>`;
+					}
+					
+					output += line + '<br>';
+				}
 				
 				output += `<br>`;
 				
-				// Top artists section - compact format  
+				// Top artists section - 2 per line format
 				output += `<span style="color: var(--accent-color);">Top Artists:</span><br>`;
-				uniqueTop.forEach((artist, index) => {
-					const artistLink = artist.external_url ? 
-						`<a href="${artist.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${artist.name}</a>` : 
-						artist.name;
-					const genreText = artist.genres ? ` <span style="color: var(--text-muted);">(${artist.genres.split(',')[0]})</span>` : '';
-					output += `<span style="color: var(--text-muted);">${index + 1}.</span> ${artistLink}${genreText}<br>`;
-				});
+				for (let i = 0; i < uniqueTop.length; i += 2) {
+					const artist1 = uniqueTop[i];
+					const artist2 = uniqueTop[i + 1];
+					
+					const artistLink1 = artist1.external_url ? 
+						`<a href="${artist1.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${artist1.name}</a>` : 
+						artist1.name;
+					const genreText1 = artist1.genres ? ` <span style="color: var(--text-muted);">(${artist1.genres.split(',')[0]})</span>` : '';
+					
+					let line = `<span style="color: var(--text-muted);">${i + 1}.</span> ${artistLink1}${genreText1}`;
+					
+					if (artist2) {
+						const artistLink2 = artist2.external_url ? 
+							`<a href="${artist2.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${artist2.name}</a>` : 
+							artist2.name;
+						const genreText2 = artist2.genres ? ` <span style="color: var(--text-muted);">(${artist2.genres.split(',')[0]})</span>` : '';
+						line += ` | <span style="color: var(--text-muted);">${i + 2}.</span> ${artistLink2}${genreText2}`;
+					}
+					
+					output += line + '<br>';
+				}
 				
 				return output;
 			} catch (error) {
