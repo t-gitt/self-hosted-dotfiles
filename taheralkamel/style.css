@@ -360,7 +360,7 @@ body {
 /* Desktop scaling */
 @media (min-width: 769px) {
     body {
-        /* transform: scale(1); */
+        transform: scale(1.5);
         transform-origin: top left;
         width: 66.67%;
         height: 66.67%;
