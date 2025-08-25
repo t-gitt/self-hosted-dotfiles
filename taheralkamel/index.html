@@ -315,8 +315,8 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 		async function showTopTracks(timeRange = 'short_term') {
 			try {
 				const [recentResponse, topResponse] = await Promise.all([
-					fetch('/api/spotify/recent-tracks?limit=10'),
-					fetch(`/api/spotify/top-artists?time_range=${timeRange}&limit=10`)
+					fetch('/api/spotify/recent-tracks?limit=15'),
+					fetch(`/api/spotify/top-artists?time_range=${timeRange}&limit=15`)
 				]);
 				
 				const recentData = await recentResponse.json();
@@ -352,23 +352,36 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 				
 				let output = ``;
 				
-				// Recent tracks section - 2 per line format
+				// Helper function to truncate text for consistent spacing
+				const truncateText = (text, maxLength) => {
+					return text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
+				};
+				
+				const isMobileView = window.innerWidth <= 768;
+				const itemsPerLine = isMobileView ? 1 : 2;
+				const maxTrackLength = isMobileView ? 30 : 25;
+				const maxArtistLength = isMobileView ? 20 : 18;
+				
+				// Recent tracks section
 				output += `<span style="color: var(--accent-color);">Recent:</span><br>`;
-				for (let i = 0; i < uniqueRecent.length; i += 2) {
-					const track1 = uniqueRecent[i];
-					const track2 = uniqueRecent[i + 1];
+				for (let i = 0; i < Math.min(uniqueRecent.length, 10); i += itemsPerLine) {
+					let line = '';
 					
-					const trackLink1 = track1.external_url ? 
-						`<a href="${track1.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${track1.name}</a>` : 
-						track1.name;
-					
-					let line = `<span style="color: var(--text-muted);">${i + 1}.</span> ${trackLink1} <span style="color: var(--text-muted);">by ${track1.artist}</span>`;
-					
-					if (track2) {
-						const trackLink2 = track2.external_url ? 
-							`<a href="${track2.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${track2.name}</a>` : 
-							track2.name;
-						line += ` | <span style="color: var(--text-muted);">${i + 2}.</span> ${trackLink2} <span style="color: var(--text-muted);">by ${track2.artist}</span>`;
+					for (let j = 0; j < itemsPerLine && (i + j) < Math.min(uniqueRecent.length, 10); j++) {
+						const track = uniqueRecent[i + j];
+						const trackName = truncateText(track.name, maxTrackLength);
+						const artistName = truncateText(track.artist, maxArtistLength);
+						
+						const trackLink = track.external_url ? 
+							`<a href="${track.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${trackName}</a>` : 
+							trackName;
+						
+						const trackEntry = `<span style="color: var(--text-muted);">${String(i + j + 1).padStart(2, ' ')}.</span> ${trackLink} <span style="color: var(--text-muted);">by ${artistName}</span>`;
+						
+						if (j > 0) {
+							line += isMobileView ? '<br>' : ' <span style="color: var(--text-muted);">|</span> ';
+						}
+						line += trackEntry;
 					}
 					
 					output += line + '<br>';
@@ -376,25 +389,27 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 				
 				output += `<br>`;
 				
-				// Top artists section - 2 per line format
+				// Top artists section
 				output += `<span style="color: var(--accent-color);">Top Artists:</span><br>`;
-				for (let i = 0; i < uniqueTop.length; i += 2) {
-					const artist1 = uniqueTop[i];
-					const artist2 = uniqueTop[i + 1];
+				for (let i = 0; i < Math.min(uniqueTop.length, 10); i += itemsPerLine) {
+					let line = '';
 					
-					const artistLink1 = artist1.external_url ? 
-						`<a href="${artist1.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${artist1.name}</a>` : 
-						artist1.name;
-					const genreText1 = artist1.genres ? ` <span style="color: var(--text-muted);">(${artist1.genres.split(',')[0]})</span>` : '';
-					
-					let line = `<span style="color: var(--text-muted);">${i + 1}.</span> ${artistLink1}${genreText1}`;
-					
-					if (artist2) {
-						const artistLink2 = artist2.external_url ? 
-							`<a href="${artist2.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${artist2.name}</a>` : 
-							artist2.name;
-						const genreText2 = artist2.genres ? ` <span style="color: var(--text-muted);">(${artist2.genres.split(',')[0]})</span>` : '';
-						line += ` | <span style="color: var(--text-muted);">${i + 2}.</span> ${artistLink2}${genreText2}`;
+					for (let j = 0; j < itemsPerLine && (i + j) < Math.min(uniqueTop.length, 10); j++) {
+						const artist = uniqueTop[i + j];
+						const artistName = truncateText(artist.name, maxArtistLength);
+						const genre = artist.genres ? truncateText(artist.genres.split(',')[0], 15) : '';
+						
+						const artistLink = artist.external_url ? 
+							`<a href="${artist.external_url}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">${artistName}</a>` : 
+							artistName;
+						
+						const genreText = genre ? ` <span style="color: var(--text-muted);">(${genre})</span>` : '';
+						const artistEntry = `<span style="color: var(--text-muted);">${String(i + j + 1).padStart(2, ' ')}.</span> ${artistLink}${genreText}`;
+						
+						if (j > 0) {
+							line += isMobileView ? '<br>' : ' <span style="color: var(--text-muted);">|</span> ';
+						}
+						line += artistEntry;
 					}
 					
 					output += line + '<br>';
