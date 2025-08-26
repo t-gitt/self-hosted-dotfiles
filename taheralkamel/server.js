@@ -194,7 +194,26 @@ app.use((req, res, next) => {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.'));
+
+// Block access to sensitive files and directories
+app.use('/data', (req, res) => {
+  res.status(403).json({ error: 'Access denied' });
+});
+
+app.use(express.static('.', {
+  dotfiles: 'deny',
+  index: false,
+  setHeaders: function (res, path) {
+    // Block access to sensitive file patterns
+    if (path.includes('tokens.json') || 
+        path.includes('.env') || 
+        path.endsWith('.log') ||
+        path.includes('node_modules') ||
+        path.includes('.git')) {
+      res.status(403);
+    }
+  }
+}));
 
 app.get('/api/spotify/current-track', async (req, res) => {
   try {
