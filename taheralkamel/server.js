@@ -195,8 +195,8 @@ app.use((req, res, next) => {
 app.use(cors());
 app.use(express.json());
 
-// Block access to sensitive files and directories
-app.use('/data', (req, res) => {
+// Block ALL access to /data directory
+app.use('/data*', (req, res) => {
   res.status(403).json({ error: 'Access denied' });
 });
 
