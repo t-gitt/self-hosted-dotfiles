@@ -66,6 +66,14 @@
 					
 					<div style="margin-bottom: 16px; color: var(--text-primary);" id="initial-links">
 					</div>
+
+					<!-- Initial help command -->
+					<div style="margin-bottom: 16px; color: var(--text-muted);">
+						<span class="prompt">❯</span> <span style="color: var(--text-muted);">help</span>
+					</div>
+					
+					<div style="margin-bottom: 16px; color: var(--text-primary);" id="initial-help">
+					</div>
 				</div>
 				
 				<!-- Input prompt line -->
@@ -460,6 +468,7 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 		initializeTheme();
 		document.getElementById('initial-about').innerHTML = MESSAGES.about;
 		document.getElementById('initial-links').innerHTML = MESSAGES.links;
+		document.getElementById('initial-help').innerHTML = MESSAGES.help;
 
 		// ===== COMMANDS =====
 		const commands = {
