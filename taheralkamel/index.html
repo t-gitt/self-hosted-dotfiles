@@ -618,7 +618,7 @@ With over ${calculateYearsOfExperience()} years of experience. I design and scal
 					terminalOutput.appendChild(errorElement);
 				}
 			} else {
-				const errorElement = createOutputElement(`bash: ${cmdName}: command not found`, true);
+				const errorElement = createOutputElement(`terminal: ${cmdName}: command not found`, true);
 				terminalOutput.appendChild(errorElement);
 			}
 			
