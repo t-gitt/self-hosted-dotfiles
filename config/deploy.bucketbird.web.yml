@@ -1,0 +1,33 @@
+# Name of your application. Used to uniquely configure containers.
+service: bucketbird
+
+# Name of the container image.
+image: t-gitt/bucketbird-web
+
+volumes:
+  - data:/app/data
+# Deploy to these servers.
+servers:
+  web:
+    - taheralkamel.com
+
+env:
+  clear:
+    BB_API_URL: https://bucketbird-api.taheralkamel.com
+    BB_ALLOW_REGISTRATION: false
+    BB_ENABLE_DEMO_LOGIN: true
+
+proxy:
+  app_port: 80
+  ssl: true
+  hosts:
+    - bucketbird.taheralkamel.com
+  healthcheck:
+    path: /healthz
+
+
+# Configure builder setup.
+builder:
+  arch: arm64
+  context: ./bucketbird/frontend
+  dockerfile: ./bucketbird/frontend/Dockerfile

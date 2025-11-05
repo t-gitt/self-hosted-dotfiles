@@ -1,0 +1,65 @@
+# Name of your application. Used to uniquely configure containers.
+service: bucketbird
+
+# Name of the container image.
+image: t-gitt/bucketbird-backend
+
+# Deploy to these servers.
+servers:
+  web:
+    - taheralkamel.com
+
+env:
+  clear:
+    BB_APP_NAME: bucketbird-api
+    BB_ENV: production
+    BB_HTTP_PORT: 8080
+    BB_ALLOWED_ORIGINS: https://bucketbird.taheralkamel.com
+    BB_DB_HOST: bucketbird-db
+    BB_COOKIE_SECURE: true
+    BB_ALLOW_REGISTRATION: false
+    BB_ENABLE_DEMO_LOGIN: true
+  secret:
+    - BB_DB_PORT
+    - BB_DB_NAME
+    - BB_DB_USER
+    - BB_DB_PASSWORD
+    - BB_JWT_SECRET
+    - BB_ENCRYPTION_KEY
+
+proxy:
+  app_port: 8080
+  ssl: true
+  hosts:
+    - bucketbird-api.taheralkamel.com
+  healthcheck:
+    path: /healthz
+
+
+# Configure builder setup.
+builder:
+  arch: arm64
+  context: ./bucketbird/backend/
+  dockerfile: ./bucketbird/backend/Dockerfile
+
+accessories:
+  db:
+    image: postgres:16-alpine
+    host: taheralkamel.com
+    env:
+      secret:
+        - POSTGRES_DB
+        - POSTGRES_USER
+        - POSTGRES_PASSWORD
+    volumes:
+      - bucketbird_db:/var/lib/postgresql/data
+  minio:
+    image: minio/minio:latest
+    host: taheralkamel.com
+    cmd: server /data --console-address ":9001"
+    env:
+      secret:
+        - MINIO_ROOT_USER
+        - MINIO_ROOT_PASSWORD
+    volumes:
+      - bucketbird_minio:/data

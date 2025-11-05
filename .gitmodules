@@ -1,0 +1,3 @@
+[submodule "bucketbird"]
+	path = bucketbird
+	url = git@github.com:s3-bucketbird/bucketbird.git
